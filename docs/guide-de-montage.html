@@ -1,0 +1,609 @@
+<title>Montage GLPI sécurisé</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..100,500..800&family=Source+Sans+3:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+  :root {
+    --bg: #F2F4F7;
+    --surface: #FFFFFF;
+    --surface-2: #E8ECF1;
+    --ink: #172029;
+    --ink-2: #4A5563;
+    --ink-3: #7B8794;
+    --line: #D3D9E1;
+    --accent: #2E5C8A;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #DCE7F3;
+    --code-bg: #1C232C;
+    --code-ink: #E6EBF0;
+    --code-cmt: #8A97A6;
+    --p-th: #B3261E;  --p-th-soft: #F6DEDC;
+    --p-h:  #B26A00;  --p-h-soft:  #F7E8CF;
+    --p-m:  #4C6A8C;  --p-m-soft:  #DDE5EE;
+    --proof: #EEF4EA; --proof-line: #7C9A6B; --proof-ink: #2F4A25;
+    --warn: #FBF1DC; --warn-line: #C98A1B; --warn-ink: #5E3E05;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12171D; --surface: #1A2129; --surface-2: #232C36;
+      --ink: #E4E8EC; --ink-2: #AEB8C3; --ink-3: #7F8B98; --line: #2E3843;
+      --accent: #7FB0E0; --accent-ink: #0F1A26; --accent-soft: #1F3247;
+      --code-bg: #0C1015; --code-ink: #DDE3EA; --code-cmt: #7F8B98;
+      --p-th: #F08C85; --p-th-soft: #3A1C1A;
+      --p-h: #E9B15E;  --p-h-soft: #3A2C12;
+      --p-m: #9DB7D3;  --p-m-soft: #1F2C3A;
+      --proof: #1B2A1B; --proof-line: #7C9A6B; --proof-ink: #C7DDB9;
+      --warn: #2E2412; --warn-line: #C98A1B; --warn-ink: #F0D39A;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12171D; --surface: #1A2129; --surface-2: #232C36;
+    --ink: #E4E8EC; --ink-2: #AEB8C3; --ink-3: #7F8B98; --line: #2E3843;
+    --accent: #7FB0E0; --accent-ink: #0F1A26; --accent-soft: #1F3247;
+    --code-bg: #0C1015; --code-ink: #DDE3EA; --code-cmt: #7F8B98;
+    --p-th: #F08C85; --p-th-soft: #3A1C1A;
+    --p-h: #E9B15E;  --p-h-soft: #3A2C12;
+    --p-m: #9DB7D3;  --p-m-soft: #1F2C3A;
+    --proof: #1B2A1B; --proof-line: #7C9A6B; --proof-ink: #C7DDB9;
+    --warn: #2E2412; --warn-line: #C98A1B; --warn-ink: #F0D39A;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink);
+    font-family: "Source Sans 3", "Segoe UI", system-ui, sans-serif;
+    font-size: 17px; line-height: 1.55;
+  }
+  a { color: var(--accent); }
+  h1, h2, h3, h4 {
+    font-family: "Archivo", "Arial Narrow", "Helvetica Neue", sans-serif;
+    font-variation-settings: "wdth" 82;
+    text-wrap: balance; line-height: 1.1; margin: 0;
+  }
+  h1 { font-size: 2.6rem; font-weight: 800; letter-spacing: -0.01em; }
+  h2 { font-size: 1.7rem; font-weight: 700; }
+  h3 { font-size: 1.15rem; font-weight: 700; margin-top: 1.6rem; }
+  p { margin: 0.6rem 0; }
+  code, pre, kbd { font-family: "JetBrains Mono", "Cascadia Mono", Consolas, monospace; }
+  code { font-size: 0.88em; background: var(--surface-2); padding: 0.05em 0.35em; border-radius: 3px; }
+  pre {
+    background: var(--code-bg); color: var(--code-ink); padding: 0.9rem 1.1rem;
+    border-radius: 6px; overflow-x: auto; font-size: 0.84rem; line-height: 1.5;
+    margin: 0.7rem 0 1rem; border-left: 3px solid var(--accent);
+  }
+  pre code { background: none; padding: 0; font-size: inherit; color: inherit; }
+  pre .c { color: var(--code-cmt); font-style: italic; }
+  pre .f { color: var(--accent); font-weight: 600; }
+  .eyebrow { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.12em; color: var(--ink-3); font-weight: 600; }
+
+  .shell { display: grid; grid-template-columns: 250px minmax(0, 1fr); gap: 3rem; max-width: 1180px; margin: 0 auto; padding: 2.5rem 2rem 5rem; }
+  nav.toc { position: sticky; top: 1.5rem; align-self: start; font-size: 0.9rem; }
+  nav.toc .eyebrow { margin-bottom: 0.6rem; }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: step; }
+  nav.toc li { counter-increment: step; border-left: 2px solid var(--line); }
+  nav.toc li a { display: flex; gap: 0.6rem; padding: 0.35rem 0 0.35rem 0.8rem; color: var(--ink-2); text-decoration: none; margin-left: -2px; border-left: 2px solid transparent; }
+  nav.toc li a::before { content: counter(step, decimal-leading-zero); font-family: "JetBrains Mono", monospace; font-size: 0.75rem; color: var(--ink-3); padding-top: 0.15em; }
+  nav.toc li a:hover, nav.toc li a:focus-visible { color: var(--ink); border-left-color: var(--accent); outline: none; }
+  nav.toc li.aux { counter-increment: none; margin-top: 0.7rem; }
+  nav.toc li.aux a::before { content: "—"; }
+
+  main { max-width: 72ch; }
+  header.hero { border-bottom: 1px solid var(--line); padding-bottom: 1.6rem; margin-bottom: 1.6rem; }
+  header.hero p.lede { font-size: 1.1rem; color: var(--ink-2); max-width: 60ch; }
+  .facts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.8rem; margin-top: 1.3rem; }
+  .fact { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 0.7rem 0.9rem; }
+  .fact .eyebrow { display: block; margin-bottom: 0.15rem; }
+  .fact strong { font-family: "Archivo", sans-serif; font-variation-settings: "wdth" 85; font-size: 1.15rem; font-weight: 700; }
+  .fact span { display: block; color: var(--ink-2); font-size: 0.88rem; }
+
+  section.step { padding: 2rem 0 1rem; border-top: 1px solid var(--line); scroll-margin-top: 1rem; }
+  section.step:first-of-type { border-top: 0; }
+  .step-head { display: flex; align-items: baseline; gap: 0.9rem; flex-wrap: wrap; }
+  .step-num { font-family: "JetBrains Mono", monospace; font-size: 0.85rem; color: var(--accent); font-weight: 600; }
+  .step-meta { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 0.55rem 0 0.4rem; align-items: center; font-size: 0.82rem; color: var(--ink-2); }
+  .chip { display: inline-block; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; padding: 0.15em 0.6em; border-radius: 3px; }
+  .chip.th { background: var(--p-th-soft); color: var(--p-th); }
+  .chip.h  { background: var(--p-h-soft);  color: var(--p-h); }
+  .chip.m  { background: var(--p-m-soft);  color: var(--p-m); }
+  .chip.machine { background: var(--surface-2); color: var(--ink-2); letter-spacing: 0.04em; text-transform: none; font-family: "JetBrains Mono", monospace; font-weight: 400; }
+
+  table { border-collapse: collapse; width: 100%; font-size: 0.92rem; margin: 0.7rem 0 1rem; font-variant-numeric: tabular-nums; }
+  .tablewrap { overflow-x: auto; }
+  th, td { text-align: left; padding: 0.45rem 0.7rem; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--ink-3); font-weight: 600; }
+  td code { white-space: nowrap; }
+
+  .callout { border-left: 3px solid; padding: 0.7rem 1rem; border-radius: 0 6px 6px 0; margin: 1rem 0; font-size: 0.95rem; }
+  .callout .eyebrow { display: block; margin-bottom: 0.2rem; }
+  .proof { background: var(--proof); border-color: var(--proof-line); color: var(--proof-ink); }
+  .proof .eyebrow { color: var(--proof-line); }
+  .warn { background: var(--warn); border-color: var(--warn-line); color: var(--warn-ink); }
+  .warn .eyebrow { color: var(--warn-line); }
+  .callout ul { margin: 0.2rem 0 0; padding-left: 1.2rem; }
+  .callout li { margin: 0.15rem 0; }
+  ul.plain { padding-left: 1.2rem; }
+  ul.plain li { margin: 0.25rem 0; }
+
+  .timeline { display: grid; grid-template-columns: 5.5rem 1fr; gap: 0.3rem 1rem; font-size: 0.95rem; }
+  .timeline .t { font-family: "JetBrains Mono", monospace; font-size: 0.82rem; color: var(--accent); font-weight: 600; padding-top: 0.15em; }
+  .checklist { list-style: none; padding: 0; margin: 0.6rem 0; display: grid; gap: 0.4rem; }
+  .checklist li { display: grid; grid-template-columns: 1.3rem 1fr; gap: 0.5rem; align-items: start; }
+  .checklist li::before { content: ""; width: 1rem; height: 1rem; border: 1.5px solid var(--ink-3); border-radius: 3px; margin-top: 0.3rem; }
+  .checklist li b { font-weight: 600; }
+
+  @media (max-width: 860px) {
+    .shell { grid-template-columns: 1fr; gap: 1.5rem; padding: 1.5rem 1.1rem 4rem; }
+    nav.toc { position: static; }
+    .facts { grid-template-columns: 1fr; }
+    h1 { font-size: 2.1rem; }
+    body { font-size: 16px; }
+  }
+  @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+</style>
+
+<div class="shell">
+<nav class="toc" aria-label="Sommaire">
+  <span class="eyebrow">Ordre de montage</span>
+  <ol>
+    <li><a href="#s1">Réseau et machines</a></li>
+    <li><a href="#s2">Serveur GLPI</a></li>
+    <li><a href="#s3">VPN WireGuard</a></li>
+    <li><a href="#s4">Pare-feu</a></li>
+    <li><a href="#s5">Double authentification</a></li>
+    <li><a href="#s6">IPS Suricata</a></li>
+    <li><a href="#s7">Client Ubuntu et agent</a></li>
+    <li><a href="#s8">Contrôle à distance</a></li>
+    <li><a href="#s9">Collecteur de mails</a></li>
+    <li class="aux"><a href="#s10">Déroulé et rapport</a></li>
+  </ol>
+</nav>
+
+<main>
+<header class="hero">
+  <span class="eyebrow">Cahier de recettes · Ticketing sécurisé</span>
+  <h1>Montage GLPI sécurisé</h1>
+  <p class="lede">Deux machines Ubuntu, un serveur GLPI joignable uniquement à travers un tunnel VPN, une double authentification et une sonde Suricata en mode blocage. Les étapes suivent les priorités du cahier de recettes, avec à chaque fois la preuve à capturer pour le rapport.</p>
+  <div class="facts">
+    <div class="fact"><span class="eyebrow">Serveur</span><strong>srv-glpi</strong><span>Ubuntu Server 24.04 · 4 Go RAM · 2 vCPU · 25 Go</span></div>
+    <div class="fact"><span class="eyebrow">Client</span><strong>pc-client</strong><span>Ubuntu Desktop 24.04 · 2 Go RAM · 1 vCPU · 20 Go</span></div>
+    <div class="fact"><span class="eyebrow">Tunnel</span><strong>10.8.0.0/24</strong><span>WireGuard, UDP 51820, seul port ouvert</span></div>
+  </div>
+</header>
+
+<!-- ============================================================ -->
+<section class="step" id="s1">
+  <div class="step-head"><span class="step-num">Étape 01</span><h2>Réseau et machines</h2></div>
+  <div class="step-meta"><span class="chip th">Très haute</span><span>Deux VM sur un même réseau, le serveur ne sera joignable que par le VPN une fois l'étape 04 terminée.</span></div>
+
+  <p>Créez les deux machines dans votre hyperviseur (VirtualBox, VMware Workstation ou Proxmox) sur un <strong>même réseau</strong>. En VirtualBox, le plus simple est un adaptateur « Réseau NAT » commun ou un « Accès par pont » sur le réseau de la salle. Le client et le serveur doivent se pinguer avant d'aller plus loin.</p>
+
+  <div class="tablewrap"><table>
+    <thead><tr><th>Machine</th><th>Nom d'hôte</th><th>IP LAN (exemple)</th><th>IP VPN</th><th>Rôles</th></tr></thead>
+    <tbody>
+      <tr><td>VM 1</td><td><code>srv-glpi</code></td><td><code>192.168.1.10</code></td><td><code>10.8.0.1</code></td><td>GLPI, MariaDB, WireGuard, UFW, Suricata, Postfix/Dovecot</td></tr>
+      <tr><td>VM 2</td><td><code>pc-client</code></td><td><code>192.168.1.20</code></td><td><code>10.8.0.2</code></td><td>Agent GLPI, pair WireGuard, serveur VNC</td></tr>
+    </tbody>
+  </table></div>
+
+  <p>Adaptez les adresses LAN à ce que votre réseau attribue, mais gardez le plan VPN tel quel : toutes les commandes du guide l'utilisent. Sur chaque machine, fixez le nom et vérifiez la connectivité.</p>
+<pre><code><span class="c"># Sur srv-glpi</span>
+sudo hostnamectl set-hostname srv-glpi
+sudo apt update && sudo apt upgrade -y
+ip -br a                       <span class="c"># notez l'IP LAN et le nom de l'interface (ex. enp0s3)</span>
+
+<span class="c"># Sur pc-client</span>
+sudo hostnamectl set-hostname pc-client
+ping -c 3 192.168.1.10</code></pre>
+
+  <div class="callout warn"><span class="eyebrow">Avant de continuer</span>Faites un instantané (snapshot) des deux VM maintenant, puis un autre à la fin de chaque étape. Le pare-feu et l'IPS peuvent vous couper l'accès, un retour arrière coûte trente secondes au lieu d'une réinstallation.</div>
+  <div class="callout proof"><span class="eyebrow">Preuve pour le rapport</span><ul><li>Capture de la configuration réseau des deux VM dans l'hyperviseur.</li><li>Sortie de <code>ip -br a</code> sur chaque machine et du ping client vers serveur.</li></ul></div>
+</section>
+
+<!-- ============================================================ -->
+<section class="step" id="s2">
+  <div class="step-head"><span class="step-num">Étape 02</span><h2>Serveur GLPI</h2></div>
+  <div class="step-meta"><span class="chip h">Haute</span><span class="chip machine">srv-glpi</span><span>Apache, PHP, MariaDB, GLPI en HTTPS.</span></div>
+
+  <h3>Pile LAMP et base de données</h3>
+<pre><code>sudo apt install -y apache2 mariadb-server php libapache2-mod-php \
+  php-mysql php-curl php-gd php-intl php-ldap php-xml php-mbstring \
+  php-zip php-bz2 php-bcmath php-apcu php-imap php-cli
+
+sudo mysql_secure_installation      <span class="c"># mot de passe root, supprimer anonymes et base test</span>
+
+sudo mysql -e "CREATE DATABASE glpi CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'glpi'@'localhost' IDENTIFIED BY 'ChangezMoi-Glpi-2026!';
+GRANT ALL PRIVILEGES ON glpi.* TO 'glpi'@'localhost';
+GRANT SELECT ON mysql.time_zone_name TO 'glpi'@'localhost';
+FLUSH PRIVILEGES;"
+
+<span class="c"># Fuseaux horaires (GLPI le réclame à l'installation)</span>
+sudo mysql_tzinfo_to_sql /usr/share/zoneinfo | sudo mysql mysql</code></pre>
+
+  <h3>Téléchargement de GLPI</h3>
+  <p>Prenez la dernière version stable. Le cahier de recettes mentionne « à partir de la version 10 » pour l'inventaire natif : la version 11 convient donc, et elle apporte la double authentification intégrée dont vous aurez besoin à l'étape 05.</p>
+<pre><code>VER=$(curl -s https://api.github.com/repos/glpi-project/glpi/releases/latest | grep -Po '"tag_name": "\K[^"]+')
+echo "Version : $VER"
+wget "https://github.com/glpi-project/glpi/releases/download/$VER/glpi-$VER.tgz"
+sudo tar -xzf "glpi-$VER.tgz" -C /var/www/
+sudo chown -R www-data:www-data /var/www/glpi</code></pre>
+
+  <h3>Certificat et hôte virtuel HTTPS</h3>
+  <p>Un certificat auto-signé suffit pour la recette. Le point important est que la racine web soit le dossier <code>public</code> de GLPI, ce qui empêche l'accès direct aux fichiers de configuration.</p>
+<pre><code>sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+  -keyout /etc/ssl/private/glpi.key -out /etc/ssl/certs/glpi.crt \
+  -subj "/CN=glpi.local"
+
+sudo tee /etc/apache2/sites-available/glpi.conf > /dev/null &lt;&lt;'EOF'
+&lt;VirtualHost *:80&gt;
+    ServerName glpi.local
+    Redirect permanent / https://glpi.local/
+&lt;/VirtualHost&gt;
+
+&lt;VirtualHost *:443&gt;
+    ServerName glpi.local
+    DocumentRoot /var/www/glpi/public
+
+    SSLEngine on
+    SSLCertificateFile    /etc/ssl/certs/glpi.crt
+    SSLCertificateKeyFile /etc/ssl/private/glpi.key
+
+    &lt;Directory /var/www/glpi/public&gt;
+        Require all granted
+        RewriteEngine On
+        RewriteCond %{HTTP:Authorization} ^(.+)$
+        RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ index.php [QSA,L]
+    &lt;/Directory&gt;
+
+    ErrorLog  ${APACHE_LOG_DIR}/glpi_error.log
+    CustomLog ${APACHE_LOG_DIR}/glpi_access.log combined
+&lt;/VirtualHost&gt;
+EOF
+
+sudo a2enmod rewrite ssl headers
+sudo a2ensite glpi && sudo a2dissite 000-default
+<span class="c"># Cookies de session protégés (exigence du cahier des charges)</span>
+sudo sed -i 's/^session.cookie_httponly.*/session.cookie_httponly = On/' /etc/php/*/apache2/php.ini
+sudo sed -i 's/^;\?session.cookie_secure.*/session.cookie_secure = On/' /etc/php/*/apache2/php.ini
+sudo systemctl restart apache2</code></pre>
+
+  <h3>Installation de la base</h3>
+  <p>Depuis le poste client, ajoutez <code>192.168.1.10 glpi.local</code> dans <code>/etc/hosts</code> puis ouvrez <code>https://glpi.local</code> (vous remplacerez cette entrée par l'IP VPN à l'étape 03). Suivez l'assistant, ou faites-le en ligne de commande, ce qui est plus rapide et reproductible :</p>
+<pre><code>cd /var/www/glpi
+sudo -u www-data php bin/console db:install \
+  --db-host=localhost --db-name=glpi --db-user=glpi \
+  --db-password='ChangezMoi-Glpi-2026!' --default-language=fr_FR --no-interaction
+
+<span class="c"># Fermer l'installeur et protéger la conf</span>
+sudo rm -f /var/www/glpi/install/install.php
+sudo chmod 640 /var/www/glpi/config/config_db.php</code></pre>
+
+  <p>Connectez-vous avec <code>glpi / glpi</code>, puis <strong>changez immédiatement</strong> les mots de passe des quatre comptes par défaut (glpi, tech, normal, post-only) dans Administration → Utilisateurs. GLPI affiche un bandeau tant que ce n'est pas fait, et c'est une capture attendue.</p>
+
+  <div class="callout proof"><span class="eyebrow">Preuve pour le rapport</span><ul><li>Page de connexion GLPI en <code>https://</code> avec le cadenas (ou l'avertissement de certificat auto-signé).</li><li>Tableau de bord après connexion, sans bandeau d'alerte sur les comptes par défaut ni sur le dossier install.</li><li>Configuration → Générale → Système : version de GLPI et de PHP.</li></ul></div>
+</section>
+
+<!-- ============================================================ -->
+<section class="step" id="s3">
+  <div class="step-head"><span class="step-num">Étape 03</span><h2>VPN WireGuard</h2></div>
+  <div class="step-meta"><span class="chip h">Haute</span><span class="chip machine">srv-glpi + pc-client</span><span>Tunnel chiffré, clé pré-partagée en plus des clés publiques.</span></div>
+
+  <p>WireGuard est le choix le plus simple à sécuriser : chiffrement moderne imposé, une seule paire de clés par machine, quelques lignes de configuration. Le cahier de recettes insiste sur la sécurisation du tunnel. Trois mesures y répondent : une <strong>clé pré-partagée</strong> qui s'ajoute à l'échange de clés, des <strong>AllowedIPs</strong> limités à la seule adresse de chaque pair, et des fichiers de clés en lecture seule pour root.</p>
+
+  <h3>Sur le serveur</h3>
+<pre><code>sudo apt install -y wireguard
+sudo umask 077
+wg genkey | sudo tee /etc/wireguard/server.key | wg pubkey | sudo tee /etc/wireguard/server.pub
+wg genpsk | sudo tee /etc/wireguard/client.psk
+sudo cat /etc/wireguard/server.pub     <span class="c"># à reporter côté client</span></code></pre>
+
+  <h3>Sur le client</h3>
+<pre><code>sudo apt install -y wireguard
+sudo umask 077
+wg genkey | sudo tee /etc/wireguard/client.key | wg pubkey | sudo tee /etc/wireguard/client.pub
+sudo cat /etc/wireguard/client.pub     <span class="c"># à reporter côté serveur</span></code></pre>
+
+  <h3>Configuration du serveur</h3>
+<pre><code>sudo tee /etc/wireguard/wg0.conf > /dev/null &lt;&lt;EOF
+[Interface]
+Address    = 10.8.0.1/24
+ListenPort = 51820
+PrivateKey = $(sudo cat /etc/wireguard/server.key)
+
+[Peer]
+# pc-client
+PublicKey    = COLLEZ_ICI_client.pub
+PresharedKey = $(sudo cat /etc/wireguard/client.psk)
+AllowedIPs   = 10.8.0.2/32
+EOF
+sudo chmod 600 /etc/wireguard/*
+sudo systemctl enable --now wg-quick@wg0</code></pre>
+
+  <h3>Configuration du client</h3>
+  <p>Copiez la valeur de <code>client.psk</code> depuis le serveur (affichez-la avec <code>sudo cat</code>, ne la faites pas transiter par mail).</p>
+<pre><code>sudo tee /etc/wireguard/wg0.conf > /dev/null &lt;&lt;EOF
+[Interface]
+Address    = 10.8.0.2/24
+PrivateKey = $(sudo cat /etc/wireguard/client.key)
+
+[Peer]
+# srv-glpi
+PublicKey           = COLLEZ_ICI_server.pub
+PresharedKey        = COLLEZ_ICI_client.psk
+Endpoint            = 192.168.1.10:51820
+AllowedIPs          = 10.8.0.0/24
+PersistentKeepalive = 25
+EOF
+sudo chmod 600 /etc/wireguard/*
+sudo systemctl enable --now wg-quick@wg0
+
+ping -c 3 10.8.0.1
+<span class="c"># Faire pointer glpi.local vers l'adresse VPN désormais</span>
+sudo sed -i 's/^192.168.1.10 glpi.local/10.8.0.1 glpi.local/' /etc/hosts</code></pre>
+
+  <p>Sur les deux machines, <code>sudo wg show</code> doit afficher un <em>latest handshake</em> récent et des compteurs de transfert qui augmentent. Sans handshake, vérifiez dans l'ordre : clés publiques inversées, clé pré-partagée différente, port 51820 bloqué par l'hyperviseur.</p>
+
+  <div class="callout proof"><span class="eyebrow">Preuve pour le rapport</span><ul><li><code>sudo wg show</code> sur le serveur et le client, avec le handshake.</li><li>Page GLPI ouverte depuis le client à l'adresse <code>https://10.8.0.1</code> ou <code>https://glpi.local</code>.</li><li>Extrait de <code>wg0.conf</code> montrant la ligne PresharedKey (valeur masquée).</li></ul></div>
+</section>
+
+<!-- ============================================================ -->
+<section class="step" id="s4">
+  <div class="step-head"><span class="step-num">Étape 04</span><h2>Pare-feu : seul le tunnel entre</h2></div>
+  <div class="step-meta"><span class="chip h">Haute</span><span class="chip machine">srv-glpi</span><span>UFW, tout refusé en entrée sauf UDP 51820, les services écoutent sur wg0.</span></div>
+
+  <div class="callout warn"><span class="eyebrow">Risque de se couper l'accès</span>Faites cette étape depuis la <strong>console de la VM</strong> dans l'hyperviseur, pas depuis une session SSH sur le LAN : cette session sera coupée dès l'activation. Vérifiez d'abord que le VPN de l'étape 03 fonctionne, c'est votre seule porte ensuite.</div>
+
+<pre><code>sudo apt install -y ufw
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+
+<span class="c"># La seule entrée autorisée depuis le réseau : le tunnel WireGuard</span>
+sudo ufw allow 51820/udp comment 'WireGuard'
+
+<span class="c"># À travers le tunnel uniquement : GLPI (HTTPS) et l'administration SSH</span>
+sudo ufw allow in on wg0 to any port 443 proto tcp comment 'GLPI via VPN'
+sudo ufw allow in on wg0 to any port 80  proto tcp comment 'redirection HTTPS'
+sudo ufw allow in on wg0 to any port 22  proto tcp comment 'SSH via VPN'
+
+sudo ufw enable
+sudo ufw status verbose</code></pre>
+
+  <p>Depuis le client, prouvez le comportement dans les deux sens : l'IP LAN du serveur ne répond plus sur les ports web et SSH, l'IP VPN répond. Installez nmap sur le client pour cela.</p>
+<pre><code>sudo apt install -y nmap
+nmap -Pn -p 22,80,443 192.168.1.10    <span class="c"># attendu : filtered</span>
+nmap -Pn -p 22,80,443 10.8.0.1        <span class="c"># attendu : open</span>
+ssh utilisateur@10.8.0.1              <span class="c"># fonctionne</span>
+ssh utilisateur@192.168.1.10          <span class="c"># expire</span></code></pre>
+
+  <p>Complément peu coûteux et très visible dans un rapport : fail2ban pour bannir les tentatives SSH répétées, même à l'intérieur du tunnel.</p>
+<pre><code>sudo apt install -y fail2ban
+sudo systemctl enable --now fail2ban
+sudo fail2ban-client status sshd</code></pre>
+
+  <div class="callout proof"><span class="eyebrow">Preuve pour le rapport</span><ul><li><code>sudo ufw status verbose</code> complet.</li><li>Les deux scans nmap côte à côte : filtered sur le LAN, open à travers le VPN.</li></ul></div>
+</section>
+
+<!-- ============================================================ -->
+<section class="step" id="s5">
+  <div class="step-head"><span class="step-num">Étape 05</span><h2>Double authentification</h2></div>
+  <div class="step-meta"><span class="chip h">Haute</span><span class="chip machine">srv-glpi</span><span>Deux niveaux : la connexion à GLPI et l'accès SSH au serveur.</span></div>
+
+  <h3>MFA sur GLPI</h3>
+  <p>GLPI 11 intègre l'authentification à deux facteurs par code temporaire (TOTP). Dans Configuration → Générale, onglet <strong>Sécurité</strong>, activez la 2FA et rendez-la <strong>obligatoire</strong> au moins pour les profils Super-Admin et Admin, avec un délai de grâce court. Chaque utilisateur enrôle ensuite son téléphone depuis ses préférences : GLPI affiche un QR code à scanner avec une application comme Aegis, FreeOTP ou Google Authenticator, et fournit des codes de secours à conserver.</p>
+  <p>Déconnectez-vous puis reconnectez-vous : GLPI demande le code à six chiffres après le mot de passe. Si vous êtes contraints à la version 10, qui n'a pas de 2FA native, portez la double authentification sur le VPN ou sur SSH, comme ci-dessous, et notez ce choix dans le rapport.</p>
+
+  <h3>MFA sur SSH</h3>
+  <p>Même à travers le VPN, un accès SSH au serveur mérite un second facteur. Le module PAM google-authenticator est standard sur Ubuntu.</p>
+<pre><code>sudo apt install -y libpam-google-authenticator
+google-authenticator -t -d -f -r 3 -R 30 -W     <span class="c"># pour VOTRE compte, scannez le QR code</span>
+
+<span class="c"># Exiger le code après le mot de passe (ou après la clé)</span>
+echo 'auth required pam_google_authenticator.so' | sudo tee -a /etc/pam.d/sshd
+sudo sed -i 's/^KbdInteractiveAuthentication.*/KbdInteractiveAuthentication yes/' /etc/ssh/sshd_config
+echo 'AuthenticationMethods password,keyboard-interactive' | sudo tee -a /etc/ssh/sshd_config
+sudo systemctl restart ssh</code></pre>
+  <p>Gardez la session courante ouverte et testez depuis une seconde session : mot de passe, puis « Verification code ». Si ça échoue, la session encore ouverte permet de corriger.</p>
+
+  <div class="callout proof"><span class="eyebrow">Preuve pour le rapport</span><ul><li>Écran de configuration 2FA de GLPI avec l'option obligatoire cochée.</li><li>Invite du code TOTP lors d'une connexion GLPI.</li><li>Session SSH montrant la demande « Verification code: ».</li></ul></div>
+</section>
+
+<!-- ============================================================ -->
+<section class="step" id="s6">
+  <div class="step-head"><span class="step-num">Étape 06</span><h2>IPS Suricata</h2></div>
+  <div class="step-meta"><span class="chip h">Haute</span><span class="chip machine">srv-glpi</span><span>Détection d'abord, blocage ensuite via NFQUEUE, avec une preuve de blocage.</span></div>
+
+  <p>Suricata s'installe depuis le dépôt officiel du projet, plus à jour que celui d'Ubuntu. Deux fichiers seulement sont à toucher : <code>suricata.yaml</code> pour le réseau à protéger, et <code>/etc/default/suricata</code> pour passer en mode blocage. Le cahier de recettes prévient que la configuration est piégeuse : le YAML est sensible à l'indentation, validez-le avec <code>suricata -T</code> avant chaque redémarrage.</p>
+
+  <h3>Installation et règles</h3>
+<pre><code>sudo add-apt-repository -y ppa:oisf/suricata-stable
+sudo apt update && sudo apt install -y suricata jq
+
+<span class="c"># Réseau surveillé : le LAN et le tunnel VPN</span>
+sudo sed -i 's|HOME_NET: "\[.*\]"|HOME_NET: "[192.168.1.0/24,10.8.0.0/24]"|' /etc/suricata/suricata.yaml
+
+<span class="c"># Jeu de règles Emerging Threats Open</span>
+sudo suricata-update
+sudo suricata -T -c /etc/suricata/suricata.yaml -v     <span class="c"># doit finir par "Configuration provided was successfully loaded"</span></code></pre>
+
+  <h3>Mode IPS avec NFQUEUE</h3>
+  <p>En mode NFQUEUE, le noyau confie chaque paquet à Suricata qui rend un verdict avant que le pare-feu ne poursuive. Les paquets du tunnel sont vus <strong>déchiffrés</strong> sur wg0, la sonde inspecte donc le trafic GLPI réel et pas seulement l'enveloppe WireGuard.</p>
+<pre><code>sudo sed -i 's/^LISTENMODE=.*/LISTENMODE=nfqueue/' /etc/default/suricata
+sudo sed -i 's/^NFQUEUE=.*/NFQUEUE=0/' /etc/default/suricata
+
+<span class="c"># Envoi du trafic vers la file 0 avant les règles UFW (persistant)</span>
+sudo sed -i '/^-A ufw-before-input -i lo -j ACCEPT/a -A ufw-before-input -j NFQUEUE --queue-num 0 --queue-bypass\n-A ufw-before-output -j NFQUEUE --queue-num 0 --queue-bypass' /etc/ufw/before.rules
+
+sudo systemctl enable --now suricata
+sudo ufw reload
+sudo tail -n 20 /var/log/suricata/suricata.log</code></pre>
+  <p>L'option <code>--queue-bypass</code> laisse passer le trafic si Suricata s'arrête. C'est un choix de disponibilité, expliquez-le dans le rapport ; enlever l'option donne un comportement « fermé en cas de panne ».</p>
+
+  <h3>Test de détection, puis de blocage</h3>
+  <p>La règle ET 2100498 se déclenche sur une réponse web de test bien connue. Elle sert d'abord à prouver la détection, puis, passée en <em>drop</em>, à prouver le blocage.</p>
+<pre><code><span class="c"># 1. Détection</span>
+curl -s http://testmynids.org/uid/index.html
+sudo tail -n 3 /var/log/suricata/fast.log         <span class="c"># ligne "GPL ATTACK_RESPONSE id check returned root"</span>
+
+<span class="c"># 2. Passer cette signature en blocage</span>
+echo '2100498' | sudo tee -a /etc/suricata/drop.conf
+sudo suricata-update
+sudo systemctl restart suricata
+
+<span class="c"># 3. Blocage : la commande ne reçoit plus la page, l'événement est journalisé en "drop"</span>
+curl -s --max-time 10 http://testmynids.org/uid/index.html ; echo "code retour : $?"
+sudo jq -c 'select(.event_type=="drop" or .event_type=="alert") | {timestamp, event_type, "sig": .alert.signature, action: .alert.action}' /var/log/suricata/eve.json | tail -n 3</code></pre>
+
+  <div class="callout proof"><span class="eyebrow">Preuve pour le rapport</span><ul><li>Sortie de <code>suricata -T</code> validant la configuration.</li><li>Ligne de <code>fast.log</code> pour la détection, puis événement <code>drop</code> dans <code>eve.json</code> avec le curl qui expire.</li><li><code>sudo ufw show raw | grep NFQUEUE</code> montrant les règles de renvoi.</li></ul></div>
+</section>
+
+<!-- ============================================================ -->
+<section class="step" id="s7">
+  <div class="step-head"><span class="step-num">Étape 07</span><h2>Client Ubuntu et agent GLPI</h2></div>
+  <div class="step-meta"><span class="chip m">Moyenne</span><span class="chip machine">pc-client</span><span>Inventaire natif GLPI, pas de FusionInventory.</span></div>
+
+  <h3>Activer l'inventaire côté serveur</h3>
+  <p>Dans GLPI : Administration → <strong>Inventaire</strong>, cochez « Activer l'inventaire ». Notez l'URL affichée, de la forme <code>https://glpi.local/front/inventory.php</code> : c'est le point d'entrée que l'agent utilisera à travers le VPN.</p>
+
+  <h3>Installer l'agent sur le client</h3>
+  <p>L'agent est fourni sous forme d'installeur Perl multi-distribution. Comme le certificat du serveur est auto-signé, on lui donne le certificat plutôt que de désactiver la vérification.</p>
+<pre><code>sudo apt install -y perl curl
+<span class="c"># Récupérer le certificat du serveur via le VPN</span>
+sudo mkdir -p /etc/glpi-agent
+openssl s_client -connect 10.8.0.1:443 -servername glpi.local &lt;/dev/null 2&gt;/dev/null \
+  | openssl x509 | sudo tee /etc/glpi-agent/glpi.crt &gt; /dev/null
+
+AGENT=$(curl -s https://api.github.com/repos/glpi-project/glpi-agent/releases/latest | grep -Po '"tag_name": "\K[^"]+')
+wget "https://github.com/glpi-project/glpi-agent/releases/download/$AGENT/glpi-agent-$AGENT-linux-installer.pl"
+sudo perl "glpi-agent-$AGENT-linux-installer.pl" --install \
+  --server="https://glpi.local/front/inventory.php" \
+  --ca-cert-file=/etc/glpi-agent/glpi.crt \
+  --tag="salle-formation" --runnow
+
+<span class="c"># Forcer un inventaire et vérifier</span>
+sudo glpi-agent --force --debug 2&gt;&amp;1 | tail -n 15
+sudo systemctl status glpi-agent</code></pre>
+  <p>Retournez dans GLPI : Parc → Ordinateurs doit lister <code>pc-client</code> avec son processeur, sa mémoire, ses disques et ses logiciels. En cas d'absence, regardez Administration → Inventaire → onglet « Journal des importations » qui explique les refus.</p>
+
+  <div class="callout proof"><span class="eyebrow">Preuve pour le rapport</span><ul><li>Écran Administration → Inventaire avec l'option activée.</li><li>Fiche de <code>pc-client</code> dans Parc → Ordinateurs, onglet Composants.</li><li>Sortie de <code>glpi-agent --force</code> montrant l'envoi accepté.</li></ul></div>
+</section>
+
+<!-- ============================================================ -->
+<section class="step" id="s8">
+  <div class="step-head"><span class="step-num">Étape 08</span><h2>Contrôle à distance</h2></div>
+  <div class="step-meta"><span class="chip m">Moyenne</span><span class="chip machine">pc-client + GLPI</span><span>VNC sur le client, joignable uniquement par le VPN, lancé depuis la fiche GLPI.</span></div>
+
+  <p>VNC est l'option la plus simple à intégrer : libre, sans compte tiers, et GLPI sait générer un lien <code>vnc://</code> à partir de l'adresse de la machine. Le serveur VNC n'écoute que sur l'adresse VPN du client, jamais sur le LAN.</p>
+
+  <h3>Sur le client</h3>
+<pre><code>sudo apt install -y x11vnc
+x11vnc -storepasswd                       <span class="c"># mot de passe VNC dans ~/.vnc/passwd</span>
+
+<span class="c"># Service qui écoute seulement sur l'IP VPN</span>
+sudo tee /etc/systemd/system/x11vnc.service &gt; /dev/null &lt;&lt;EOF
+[Unit]
+Description=Serveur VNC (x11vnc) sur le tunnel VPN
+After=display-manager.service wg-quick@wg0.service
+
+[Service]
+ExecStart=/usr/bin/x11vnc -auth guess -display :0 -usepw -rfbauth $HOME/.vnc/passwd -listen 10.8.0.2 -rfbport 5900 -forever -shared
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+EOF
+sudo systemctl daemon-reload && sudo systemctl enable --now x11vnc
+
+sudo ufw allow in on wg0 to any port 5900 proto tcp comment 'VNC via VPN'
+sudo ufw enable</code></pre>
+
+  <h3>Intégration dans GLPI</h3>
+  <p>Configuration → <strong>Liens externes</strong> → Ajouter. Nom « Prise en main VNC », lien <code>vnc://[IP]:5900</code>, et dans l'onglet « Type d'objet » cochez Ordinateurs. La balise <code>[IP]</code> est remplacée par l'adresse inventoriée de la machine. Sur la fiche de <code>pc-client</code>, l'onglet Liens propose alors le raccourci. Pour que l'adresse résolue soit celle du VPN, l'agent doit remonter l'interface wg0, ce qui est le cas par défaut ; sinon utilisez un lien fixe <code>vnc://10.8.0.2:5900</code>.</p>
+  <p>Depuis le poste d'administration relié au VPN (le serveur n'ayant pas d'interface graphique, ajoutez votre machine hôte comme troisième pair WireGuard si nécessaire), un client comme Remmina ou TigerVNC Viewer ouvre la session.</p>
+
+  <div class="callout proof"><span class="eyebrow">Preuve pour le rapport</span><ul><li>Lien externe configuré dans GLPI et l'onglet Liens sur la fiche du client.</li><li>Fenêtre VNC ouverte sur le bureau du client, avec un terminal affichant <code>ip a</code> dedans.</li><li><code>ss -ltnp | grep 5900</code> sur le client montrant l'écoute sur 10.8.0.2 seulement.</li></ul></div>
+</section>
+
+<!-- ============================================================ -->
+<section class="step" id="s9">
+  <div class="step-head"><span class="step-num">Étape 09</span><h2>Collecteur de mails</h2></div>
+  <div class="step-meta"><span class="chip m">Moyenne</span><span class="chip machine">srv-glpi</span><span>Boîte IMAP locale relevée par le collecteur natif de GLPI, création automatique de tickets.</span></div>
+
+  <p>GLPI intègre déjà le « script » demandé : un collecteur qui relève une boîte IMAP et transforme chaque mail en ticket. Il reste à lui fournir une boîte. Une messagerie locale Postfix + Dovecot évite toute dépendance à un compte externe et respecte la règle « aucune donnée réelle ».</p>
+
+  <h3>Messagerie locale</h3>
+<pre><code>sudo DEBIAN_FRONTEND=noninteractive apt install -y postfix dovecot-imapd bsd-mailx
+sudo postconf -e 'myhostname = srv-glpi.local' 'inet_interfaces = loopback-only' 'mydestination = $myhostname, localhost'
+sudo systemctl restart postfix
+
+<span class="c"># Compte système qui reçoit les demandes</span>
+sudo adduser --disabled-login --gecos 'Boite support' support
+echo 'support:Support-Glpi-2026!' | sudo chpasswd
+
+<span class="c"># Dovecot : IMAP en clair autorisé sur localhost seulement</span>
+sudo sed -i 's/^#\?disable_plaintext_auth.*/disable_plaintext_auth = no/' /etc/dovecot/conf.d/10-auth.conf
+sudo sed -i 's/^#\?mail_location.*/mail_location = mbox:~\/mail:INBOX=\/var\/mail\/%u/' /etc/dovecot/conf.d/10-mail.conf
+sudo systemctl restart dovecot
+ss -ltn | grep 143</code></pre>
+
+  <h3>Collecteur dans GLPI</h3>
+  <p>Configuration → <strong>Collecteurs</strong> → Ajouter :</p>
+  <div class="tablewrap"><table>
+    <tbody>
+      <tr><td>Nom</td><td>Support par mail</td></tr>
+      <tr><td>Serveur de messagerie</td><td><code>localhost</code>, port <code>143</code>, protocole IMAP, sans TLS. Chaîne générée : <code>{localhost:143/imap/notls}INBOX</code></td></tr>
+      <tr><td>Identifiant / mot de passe</td><td><code>support</code> / celui défini plus haut</td></tr>
+      <tr><td>Actif</td><td>Oui</td></tr>
+    </tbody>
+  </table></div>
+  <p>Le bouton « Tester la connexion » doit passer au vert. Ensuite, dans Configuration → <strong>Actions automatiques</strong>, ouvrez <code>mailgate</code>, mettez le mode sur CLI et la fréquence à 2 minutes. Les actions CLI ont besoin du cron système :</p>
+<pre><code>echo '*/1 * * * * www-data /usr/bin/php /var/www/glpi/front/cron.php' | sudo tee /etc/cron.d/glpi</code></pre>
+
+  <h3>Test de bout en bout</h3>
+  <p>GLPI rattache un mail à l'utilisateur dont l'adresse correspond à l'expéditeur. Donnez donc à l'utilisateur <code>normal</code> l'adresse <code>normal@srv-glpi.local</code> dans sa fiche, puis envoyez un mail depuis cette identité :</p>
+<pre><code>echo "Bonjour, mon écran reste noir au démarrage." \
+  | mail -s "Panne écran salle 2" -r normal@srv-glpi.local support@localhost
+
+sudo -u www-data php /var/www/glpi/front/cron.php mailgate     <span class="c"># sans attendre le cron</span></code></pre>
+  <p>Assistance → Tickets affiche « Panne écran salle 2 », demandeur <code>normal</code>, source « Mail ». Le rapport peut mentionner l'alternative : pointer le collecteur vers une boîte IMAP externe fictive, la configuration GLPI est identique, seuls le serveur et le port TLS changent.</p>
+
+  <div class="callout proof"><span class="eyebrow">Preuve pour le rapport</span><ul><li>Collecteur avec le test de connexion réussi.</li><li>Action automatique mailgate en mode CLI et sa dernière exécution.</li><li>Le ticket créé automatiquement, avec l'origine « Mail » visible.</li></ul></div>
+</section>
+
+<!-- ============================================================ -->
+<section class="step" id="s10">
+  <div class="step-head"><span class="step-num">Organisation</span><h2>Déroulé de la journée et rapport</h2></div>
+
+  <h3>Rythme imposé par le cahier de recettes</h3>
+  <div class="timeline">
+    <span class="t">0 h → 6 h</span><span>Chacun monte l'infrastructure de son côté. Snapshot à chaque étape validée, captures au fil de l'eau dans un dossier par étape.</span>
+    <span class="t">6 h</span><span>Mise en commun. Le chef de projet passe dans les rangs, on compare l'avancement, on note qui est allé le plus loin.</span>
+    <span class="t">6 h → 8 h</span><span>Le plus avancé termine le montage. Il envoie ses captures au second apprenant qui rédige le rapport.</span>
+    <span class="t">8 h → 9 h</span><span>Ajustements et finitions, relecture croisée du rapport.</span>
+  </div>
+
+  <h3>Réunions chef de projet, vendredi 4</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>Groupe</th><th>Heure</th><th>Groupe</th><th>Heure</th></tr></thead>
+    <tbody>
+      <tr><td>GR1</td><td>11 h 00</td><td>GR4</td><td>12 h 00</td></tr>
+      <tr><td>GR2</td><td>11 h 20</td><td>GR5</td><td>14 h 00</td></tr>
+      <tr><td>GR3</td><td>11 h 40</td><td>GR6</td><td>14 h 20</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>Ordre de priorité si le temps manque</h3>
+  <p>Les étapes 01 à 06 sont classées très haute ou haute et forment le socle défendable : un GLPI joignable seulement par VPN, avec MFA et IPS. Les étapes 07 à 09 sont moyennes. Entre elles, faites l'agent en premier : c'est la plus rapide, et le contrôle à distance en dépend pour le lien <code>[IP]</code>.</p>
+
+  <h3>Squelette du rapport de recette</h3>
+  <p>Reprenez le tableau du cahier de recettes comme grille : une ligne par fonctionnalité, sa priorité, l'état (fait, partiel, non fait), la preuve, et l'écart éventuel avec ce qui était prévu. Le cahier des charges demande en plus de se positionner sur chaque risque du référentiel de sécurité, ce que votre montage couvre en grande partie.</p>
+  <ul class="checklist">
+    <li><span><b>Contexte et périmètre.</b> Les deux machines, le schéma réseau avec le LAN et le tunnel, les versions installées.</span></li>
+    <li><span><b>Grille de recette.</b> Les dix fonctionnalités du cahier avec priorité, état et renvoi vers la preuve.</span></li>
+    <li><span><b>Preuves.</b> Les captures par étape, chacune légendée par ce qu'elle démontre.</span></li>
+    <li><span><b>Couverture sécurité.</b> Contrôle d'accès (pare-feu, VPN), authentification (MFA, mots de passe par défaut changés), chiffrement en transit (HTTPS, WireGuard), journalisation et supervision (Suricata, fail2ban, journaux GLPI), composants à jour (versions récentes de GLPI et de l'agent).</span></li>
+    <li><span><b>Écarts et choix.</b> Certificat auto-signé, mode bypass de l'IPS, messagerie locale à la place d'une boîte externe, et pourquoi.</span></li>
+    <li><span><b>Outils d'assistance utilisés.</b> Le cahier des charges impose de les déclarer et de savoir justifier chaque choix.</span></li>
+  </ul>
+</section>
+</main>
+</div>

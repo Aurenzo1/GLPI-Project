@@ -1,0 +1,24 @@
+# Secrets : jamais dans le dépôt
+*.key
+*.pub
+*.psk
+*.pass
+*.env
+*secret*
+*password*
+*comptes*
+/config/**/wg0.conf
+!/config/**/wg0.conf.example
+# Images disques, snapshots, ISO, vidéos
+*.vdi
+*.vmdk
+*.sav
+*.iso
+*.mp4
+# Artefacts locaux
+*.log
+*.tgz
+*.zip
+__pycache__/
+.DS_Store
+Thumbs.db
