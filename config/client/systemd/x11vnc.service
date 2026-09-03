@@ -1,0 +1,12 @@
+[Unit]
+Description=Serveur VNC (x11vnc) sur le tunnel VPN uniquement
+After=display-manager.service wg-quick@wg0.service
+Wants=wg-quick@wg0.service
+
+[Service]
+ExecStart=/usr/bin/x11vnc -auth guess -display :0 -rfbauth /etc/x11vnc.pass -no6 -listen 10.8.0.2 -rfbport 5900 -forever -shared -noxdamage -o /var/log/x11vnc.log
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
