@@ -1,0 +1,12 @@
+context	name	value
+core	2fa_enforced	1
+core	2fa_grace_date_start	2026-09-03 10:22:17
+core	2fa_grace_days	2
+core	2fa_suffix	
+inventory	enabled_inventory	1
+name	link
+Prise en main VNC	vnc://[IP]:5900
+name	host	login	is_active
+Support par mail	{localhost:143/imap/notls}INBOX	support	1
+name	mode	frequency
+mailgate	2	120
