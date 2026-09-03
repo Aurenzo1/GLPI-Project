@@ -1,0 +1,10 @@
+[Interface]
+Address    = 10.8.0.1/24
+ListenPort = 51820
+PrivateKey = <A_GENERER>
+
+[Peer]
+# pc-client
+PublicKey    = ePI1eUfg5a4h2Piw45kchrA5d4uaJiJDy5CS5LEWlS0=
+PresharedKey = <A_GENERER>
+AllowedIPs   = 10.8.0.2/32

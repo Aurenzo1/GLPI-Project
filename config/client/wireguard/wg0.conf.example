@@ -1,0 +1,11 @@
+[Interface]
+Address    = 10.8.0.2/24
+PrivateKey = <A_GENERER>
+
+[Peer]
+# srv-glpi
+PublicKey           = TksdrVa2N5pj/8Q1ECLlENOPW24bXuiUAZC6Kin91Rs=
+PresharedKey = <A_GENERER>
+Endpoint            = 192.168.1.10:51820
+AllowedIPs          = 10.8.0.0/24
+PersistentKeepalive = 25
