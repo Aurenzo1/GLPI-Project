@@ -1,0 +1,16 @@
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), disabled (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+51820/udp                  ALLOW IN    Anywhere                   # WireGuard
+443/tcp on wg0             ALLOW IN    Anywhere                   # GLPI-via-VPN
+80/tcp on wg0              ALLOW IN    Anywhere                   # redirection-HTTPS
+22/tcp on wg0              ALLOW IN    Anywhere                   # SSH-via-VPN
+51820/udp (v6)             ALLOW IN    Anywhere (v6)              # WireGuard
+443/tcp (v6) on wg0        ALLOW IN    Anywhere (v6)              # GLPI-via-VPN
+80/tcp (v6) on wg0         ALLOW IN    Anywhere (v6)              # redirection-HTTPS
+22/tcp (v6) on wg0         ALLOW IN    Anywhere (v6)              # SSH-via-VPN
+

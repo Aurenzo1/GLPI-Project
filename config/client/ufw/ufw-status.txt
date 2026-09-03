@@ -1,0 +1,12 @@
+Status: active
+Logging: on (low)
+Default: deny (incoming), allow (outgoing), disabled (routed)
+New profiles: skip
+
+To                         Action      From
+--                         ------      ----
+22/tcp                     ALLOW IN    Anywhere                   # SSH admin
+5900/tcp on wg0            ALLOW IN    Anywhere                   # VNC via VPN
+22/tcp (v6)                ALLOW IN    Anywhere (v6)              # SSH admin
+5900/tcp (v6) on wg0       ALLOW IN    Anywhere (v6)              # VNC via VPN
+
