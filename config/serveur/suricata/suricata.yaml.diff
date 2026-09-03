@@ -1,0 +1,38 @@
+--- /etc/suricata/suricata.yaml.orig	2026-09-03 10:30:07.559384265 +0000
++++ /etc/suricata/suricata.yaml	2026-09-03 12:19:49.625944181 +0000
+@@ -15,7 +15,7 @@
+ vars:
+   # more specific is better for alert accuracy and performance
+   address-groups:
+-    HOME_NET: "[192.168.0.0/16,10.0.0.0/8,172.16.0.0/12]"
++    HOME_NET: "[192.168.1.0/24,10.8.0.0/24]"
+     #HOME_NET: "[192.168.0.0/16]"
+     #HOME_NET: "[10.0.0.0/8]"
+     #HOME_NET: "[172.16.0.0/12]"
+@@ -2059,7 +2059,7 @@
+ # set then the NFQ bypass is activated. Suricata will set the bypass mark/mask
+ # on packet of a flow that need to be bypassed. The Netfilter ruleset has to
+ # directly accept all packets of a flow once a packet has been marked.
+-nfq:
++#nfq-original:
+ #  mode: accept
+ #  repeat-mark: 1
+ #  repeat-mask: 1
+@@ -2329,6 +2329,7 @@
+ 
+ rule-files:
+   - suricata.rules
++  - /etc/suricata/rules/local.rules
+ 
+ ##
+ ## Auxiliary configuration files.
+@@ -2365,3 +2366,9 @@
+ #include:
+ #  - include1.yaml
+ #  - include2.yaml
++
++# Mode IPS : apres inspection, le paquet accepte est marque et reprend son parcours dans les regles UFW
++nfq:
++  mode: repeat
++  repeat-mark: 1
++  repeat-mask: 1
