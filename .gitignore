@@ -15,6 +15,7 @@
 *.sav
 *.iso
 *.mp4
+!docs/demo/GLPI-Presentation.mp4
 # Artefacts locaux
 *.log
 *.tgz

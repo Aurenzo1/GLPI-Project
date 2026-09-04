@@ -35,7 +35,7 @@ tickets par mail.
 ## Contenu du dépôt
 
 ```
-docs/                      guide de montage (HTML + PDF) et légende des captures d'écran
+docs/                      guide de montage (HTML + PDF), documentation technique, légende des captures, vidéo de démonstration (docs/demo)
 scripts/serveur/           installation rejouable : étape 02 (GLPI), 06 (Suricata), 06b (règles IPS), 09 (mails)
 scripts/glpi/              outils PHP : chiffrement du mot de passe du collecteur, restauration des tableaux de bord
 scripts/demo/              une commande par séquence de la vidéo de démonstration
