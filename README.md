@@ -98,10 +98,3 @@ La légende détaillée des captures est dans `docs/captures-legende.md`.
 
 Aucun secret n'est versionné (`.gitignore`). Sur les machines : `/root/glpi-db.env`, `/root/glpi-comptes.txt`,
 `/root/mail-support.env` (serveur), `/root/vnc-mdp.txt` (client), clés WireGuard dans `/etc/wireguard/` (mode 600).
-
-## Outils d'assistance
-
-Conformément au cahier des charges, l'usage d'un assistant de développement est déclaré : Claude (Anthropic) a été
-utilisé pour rédiger le guide de montage, les scripts d'installation et de démonstration, et pour diagnostiquer les
-incidents (DNS du réseau NAT VirtualBox, plantage noyau sous Hyper-V, contournement d'UFW par Suricata). Les choix
-techniques sont expliqués dans le guide et dans ce README, et ont été validés sur l'infrastructure réelle.
