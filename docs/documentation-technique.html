@@ -1,0 +1,990 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Documentation technique — Infrastructure GLPI sécurisée</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Serif:ital,wght@0,600;0,700;1,400&display=swap" rel="stylesheet"><style>
+:root{
+  --paper:#F6F5F1;
+  --panel:#FFFFFF;
+  --ink:#12213A;
+  --ink-soft:#48566E;
+  --line:#DDE1E7;
+  --line-soft:#E8EAEE;
+  --navy:#0F2A4A;
+  --navy-deep:#081729;
+  --teal:#1E8A85;
+  --teal-soft:#E4F2F1;
+  --amber:#9C6B12;
+  --amber-soft:#FBF0DC;
+  --green:#2C6E49;
+  --green-soft:#E7F2EA;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+  --sans: 'IBM Plex Sans', -apple-system, sans-serif;
+  --serif: 'IBM Plex Serif', Georgia, serif;
+}
+:root:not([data-theme="light"]){
+  @media (prefers-color-scheme: dark){
+    --paper:#0B1622;
+    --panel:#101E30;
+    --ink:#E8ECF2;
+    --ink-soft:#9FB0C6;
+    --line:#22344B;
+    --line-soft:#1B2A3E;
+    --navy:#1B3A5E;
+    --navy-deep:#081729;
+    --teal:#4FC3BC;
+    --teal-soft:#12302E;
+    --amber:#E3B15C;
+    --amber-soft:#3A2E14;
+    --green:#7FBE97;
+    --green-soft:#163523;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0B1622;
+  --panel:#101E30;
+  --ink:#E8ECF2;
+  --ink-soft:#9FB0C6;
+  --line:#22344B;
+  --line-soft:#1B2A3E;
+  --navy:#1B3A5E;
+  --navy-deep:#081729;
+  --teal:#4FC3BC;
+  --teal-soft:#12302E;
+  --amber:#E3B15C;
+  --amber-soft:#3A2E14;
+  --green:#7FBE97;
+  --green-soft:#163523;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:var(--sans);
+  font-size:16.5px;
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block;}
+a{color:var(--teal);}
+
+/* ---------- Hero ---------- */
+.hero{
+  position:relative;
+  background:linear-gradient(160deg, var(--navy-deep) 0%, var(--navy) 62%, #123b52 100%);
+  color:#EDF3F8;
+  padding:72px 24px 56px;
+  overflow:hidden;
+}
+.hero__net{
+  position:absolute; inset:0;
+  opacity:.35;
+  pointer-events:none;
+}
+.hero__inner{
+  position:relative;
+  max-width:760px;
+  margin:0 auto;
+}
+.hero__kicker{
+  font-family:var(--mono);
+  font-size:13px;
+  letter-spacing:.04em;
+  color:#8FD9D2;
+  margin:0 0 18px;
+}
+.hero h1{
+  font-family:var(--serif);
+  font-weight:700;
+  font-size:clamp(30px,5vw,44px);
+  line-height:1.12;
+  margin:0 0 14px;
+  max-width:14ch;
+}
+.hero__sub{
+  font-size:18px;
+  color:#C9D8E4;
+  max-width:52ch;
+  margin:0 0 34px;
+}
+.hero__meta{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px 28px;
+  font-size:14px;
+  border-top:1px solid rgba(255,255,255,.18);
+  padding-top:22px;
+  max-width:520px;
+}
+.hero__meta dt{color:#7E93AA;font-family:var(--mono);font-size:11.5px;}
+.hero__meta dd{margin:2px 0 0;color:#EDF3F8;font-weight:500;}
+
+/* ---------- Layout ---------- */
+.wrap{max-width:760px;margin:0 auto;padding:0 24px;}
+.toc{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:4px;
+  margin:-30px auto 56px;
+  padding:22px 26px;
+  position:relative;
+  z-index:2;
+}
+.toc h2{
+  font-family:var(--mono);
+  font-size:12px;
+  letter-spacing:.05em;
+  color:var(--ink-soft);
+  margin:0 0 14px;
+  font-weight:600;
+}
+.toc ul{list-style:none;margin:0;padding:0;columns:2;column-gap:28px;}
+.toc li{break-inside:avoid;margin-bottom:6px;}
+.toc a{
+  display:flex;gap:10px;align-items:baseline;
+  text-decoration:none;color:var(--ink);
+  font-size:14.5px;padding:3px 0;
+}
+.toc a:hover .toc__label{color:var(--teal);}
+.toc__num{font-family:var(--mono);font-size:12px;color:var(--teal);flex-shrink:0;}
+.toc__label{color:var(--ink);}
+
+section{margin:0 0 58px;}
+section h2{
+  font-family:var(--serif);
+  font-size:26px;
+  font-weight:700;
+  margin:0 0 6px;
+  padding-bottom:14px;
+  border-bottom:2px solid var(--navy);
+  display:flex; align-items:baseline; gap:12px;
+}
+section h2 .sec-num{
+  font-family:var(--mono);
+  font-size:14px;
+  color:var(--teal);
+  font-weight:600;
+}
+section h3{
+  font-family:var(--sans);
+  font-size:16.5px;
+  font-weight:600;
+  margin:28px 0 10px;
+  color:var(--navy);
+}
+:root:not([data-theme="light"]) section h3{ @media (prefers-color-scheme: dark){ color:#8FD9D2; } }
+:root[data-theme="dark"] section h3{ color:#8FD9D2; }
+
+section p{margin:0 0 16px;color:var(--ink);}
+section p.lede{color:var(--ink-soft);font-size:16px;}
+ul.plain{margin:0 0 16px;padding-left:22px;}
+ul.plain li{margin-bottom:8px;}
+code, .kbd{
+  font-family:var(--mono);
+  background:var(--line-soft);
+  padding:2px 6px;
+  border-radius:3px;
+  font-size:.9em;
+}
+
+/* ---------- Callouts ---------- */
+.callout{
+  border-left:3px solid var(--teal);
+  background:var(--teal-soft);
+  padding:14px 18px;
+  border-radius:0 4px 4px 0;
+  margin:20px 0;
+  font-size:15px;
+}
+.callout--warn{border-left-color:var(--amber);background:var(--amber-soft);}
+.callout__label{
+  font-family:var(--mono);
+  font-size:11.5px;
+  letter-spacing:.04em;
+  color:var(--amber);
+  display:block;
+  margin-bottom:6px;
+  font-weight:600;
+}
+.callout--warn .callout__label{color:var(--amber);}
+.callout--info .callout__label{color:var(--teal);}
+
+/* ---------- Table ---------- */
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:4px;}
+table{width:100%;border-collapse:collapse;font-size:14.5px;min-width:620px;}
+thead th{
+  text-align:left;
+  font-family:var(--mono);
+  font-size:11.5px;
+  letter-spacing:.03em;
+  color:var(--ink-soft);
+  background:var(--line-soft);
+  padding:12px 14px;
+  border-bottom:1px solid var(--line);
+  font-weight:600;
+}
+tbody td{
+  padding:13px 14px;
+  border-bottom:1px solid var(--line-soft);
+  vertical-align:top;
+}
+tbody tr:last-child td{border-bottom:none;}
+.col-feat{font-weight:600;white-space:nowrap;}
+.col-impl{color:var(--ink-soft);}
+.prio{font-family:var(--mono);font-size:12px;padding:3px 8px;border-radius:3px;white-space:nowrap;}
+.prio--critical{background:var(--amber-soft);color:var(--amber);}
+.prio--high{background:var(--teal-soft);color:var(--teal);}
+.prio--mid{background:var(--line-soft);color:var(--ink-soft);}
+.badge{font-family:var(--mono);font-size:12px;padding:4px 9px;border-radius:3px;white-space:nowrap;display:inline-block;}
+.badge--ok{background:var(--green-soft);color:var(--green);}
+.badge--warn{background:var(--amber-soft);color:var(--amber);}
+
+/* ---------- Figures ---------- */
+.fig{margin:26px 0;}
+.fig__tag{
+  font-family:var(--mono);
+  font-size:10.5px;
+  letter-spacing:.06em;
+  color:var(--ink-soft);
+  margin-bottom:8px;
+}
+.fig__frame{
+  border-radius:6px;
+  overflow:hidden;
+  border:1px solid var(--line);
+}
+.fig--terminal .fig__frame{
+  background:#0D1B2A;
+  padding:34px 4px 4px;
+  position:relative;
+  border-color:#0D1B2A;
+}
+.fig--terminal .fig__frame::before{
+  content:"";
+  position:absolute; top:0; left:0; right:0; height:26px;
+  background:#16283C;
+}
+.fig--terminal .fig__frame::after{
+  content:"● ● ●";
+  position:absolute; top:6px; left:12px;
+  font-size:10px; letter-spacing:3px; color:#3A5069;
+}
+.fig--terminal img{border-radius:3px;}
+.fig--browser .fig__frame{
+  background:var(--panel);
+  padding:26px 2px 2px;
+  position:relative;
+  border-color:var(--line);
+}
+.fig--browser .fig__frame::before{
+  content:"";
+  position:absolute; top:0; left:0; right:0; height:20px;
+  background:var(--line-soft);
+  border-bottom:1px solid var(--line);
+}
+.fig--browser .fig__frame::after{
+  content:"○ ○ ○";
+  position:absolute; top:3px; left:10px;
+  font-size:9px; letter-spacing:2px; color:var(--ink-soft);
+}
+.fig img{width:100%;height:auto;}
+figcaption{
+  font-size:13.5px;
+  color:var(--ink-soft);
+  margin-top:9px;
+  line-height:1.5;
+}
+.fig__num{font-family:var(--mono);color:var(--teal);font-weight:600;margin-right:4px;}
+
+/* ---------- Écarts list ---------- */
+.gap-list{list-style:none;margin:0;padding:0;}
+.gap-list li{
+  padding:14px 0 14px 28px;
+  border-bottom:1px solid var(--line-soft);
+  position:relative;
+  font-size:15px;
+  color:var(--ink-soft);
+}
+.gap-list li:last-child{border-bottom:none;}
+.gap-list li::before{
+  content:"—";
+  position:absolute; left:0; top:14px;
+  color:var(--amber);
+  font-family:var(--mono);
+}
+
+/* ---------- Video note ---------- */
+.video-card{
+  border:1px dashed var(--line);
+  border-radius:6px;
+  padding:22px;
+  display:flex;
+  gap:16px;
+  align-items:flex-start;
+  background:var(--panel);
+}
+.video-card__icon{
+  flex-shrink:0;
+  width:42px;height:42px;
+  border-radius:50%;
+  background:var(--navy);
+  display:flex;align-items:center;justify-content:center;
+}
+.video-card__icon svg{width:16px;height:16px;}
+
+/* ---------- Footer ---------- */
+footer{
+  border-top:1px solid var(--line);
+  padding:34px 24px 60px;
+  text-align:center;
+}
+footer p{
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--ink-soft);
+  margin:0;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width:640px){
+  .hero{padding:52px 18px 44px;}
+  .hero__meta{grid-template-columns:1fr;}
+  .toc{margin:-22px 12px 44px;padding:18px;}
+  .toc ul{columns:1;}
+  .wrap{padding:0 18px;}
+  section h2{font-size:22px;}
+  table{font-size:13px;}
+}
+@media print{
+  .hero{background:var(--navy) !important;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+}
+
+/* ---------- Compléments documentation technique (même système que le rapport) ---------- */
+pre{
+  background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--teal);border-radius:4px;
+  padding:14px 16px;margin:0 0 18px;overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.55;color:var(--ink);
+}
+pre code{background:none;padding:0;font-size:inherit;border:0;}
+.plain{padding-left:20px;margin:0 0 16px;} .plain li{margin:0 0 6px;}
+.steps{padding-left:22px;margin:0 0 16px;} .steps li{margin:0 0 6px;}
+.diagram{margin:22px 0 28px;} .diagram svg{width:100%;height:auto;display:block;background:var(--panel);border:1px solid var(--line);border-radius:4px;}
+.diagram figcaption{font-family:var(--mono);font-size:12px;color:var(--ink-soft);margin-top:8px;}
+.hero__meta{max-width:640px;}
+.callout--info{border-left-color:var(--teal);background:var(--teal-soft);}
+.doc-footer{border-top:1px solid var(--line);padding:18px 0 40px;font-family:var(--mono);font-size:12px;color:var(--ink-soft);}
+td,th{vertical-align:top;}
+.toc__pg{margin-left:auto;font-family:var(--mono);font-size:12px;color:var(--ink-soft);padding-left:10px;}
+</style></head><body><div class="hero">
+  <svg class="hero__net" viewBox="0 0 760 320" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+    <g stroke="#4FC3BC" stroke-width="1" opacity="0.5">
+      <line x1="40" y1="30" x2="220" y2="110"/><line x1="220" y1="110" x2="180" y2="240"/><line x1="220" y1="110" x2="420" y2="60"/>
+      <line x1="420" y1="60" x2="600" y2="140"/><line x1="600" y1="140" x2="720" y2="70"/><line x1="600" y1="140" x2="650" y2="260"/>
+      <line x1="180" y1="240" x2="360" y2="280"/><line x1="360" y1="280" x2="530" y2="230"/><line x1="420" y1="60" x2="360" y2="280"/><line x1="40" y1="30" x2="10" y2="180"/>
+    </g>
+    <g fill="#8FD9D2">
+      <circle cx="40" cy="30" r="3"/><circle cx="220" cy="110" r="4"/><circle cx="180" cy="240" r="3"/><circle cx="420" cy="60" r="3"/><circle cx="600" cy="140" r="4"/>
+      <circle cx="720" cy="70" r="3"/><circle cx="650" cy="260" r="3"/><circle cx="360" cy="280" r="3"/><circle cx="530" cy="230" r="3"/><circle cx="10" cy="180" r="3"/>
+    </g>
+  </svg>
+  <div class="hero__inner">
+    <p class="hero__kicker">DOCUMENTATION TECHNIQUE — PROJET TECHNIQUE</p>
+    <h1>Infrastructure GLPI sécurisée</h1>
+    <p class="hero__sub">Architecture, configuration détaillée, procédures d'installation et d'exploitation de la plateforme de ticketing : GLPI 11 derrière un tunnel WireGuard, un pare-feu, une double authentification et un IPS Suricata.</p>
+    <dl class="hero__meta">
+      <div><dt>Formation</dt><dd>Cybersécurité — audit et méthodologie, LiveCampus 2025</dd></div>
+      <div><dt>Rédigé par</dt><dd>Bidault Dorian &amp; Febbraro Enzo</dd></div>
+      <div><dt>Encadrant</dt><dd>Laurent Coupeau</dd></div>
+      <div><dt>Date</dt><dd>Vendredi 4 septembre 2026</dd></div>
+      <div><dt>Version</dt><dd>1.0</dd></div>
+      <div><dt>Documents liés</dt><dd>Cahier des charges CDC-TICKETING-SEC-001, cahier de recettes, rapport de recette</dd></div>
+    </dl>
+  </div>
+</div>
+
+<div class="wrap">
+  <nav class="toc" aria-label="Sommaire">
+    <h2>Sommaire</h2>
+    <ul>
+      <li><a href="#objet"><span class="toc__num">01</span><span class="toc__label">Objet et périmètre</span></a></li>
+      <li><a href="#architecture"><span class="toc__num">02</span><span class="toc__label">Architecture générale</span></a></li>
+      <li><a href="#virtualisation"><span class="toc__num">03</span><span class="toc__label">Virtualisation et réseau</span></a></li>
+      <li><a href="#serveur"><span class="toc__num">04</span><span class="toc__label">Serveur GLPI</span></a></li>
+      <li><a href="#vpn"><span class="toc__num">05</span><span class="toc__label">Tunnel VPN WireGuard</span></a></li>
+      <li><a href="#parefeu"><span class="toc__num">06</span><span class="toc__label">Pare-feu et protection SSH</span></a></li>
+      <li><a href="#mfa"><span class="toc__num">07</span><span class="toc__label">Double authentification</span></a></li>
+      <li><a href="#ips"><span class="toc__num">08</span><span class="toc__label">IPS Suricata</span></a></li>
+      <li><a href="#client"><span class="toc__num">09</span><span class="toc__label">Poste client et agent GLPI</span></a></li>
+      <li><a href="#vnc"><span class="toc__num">10</span><span class="toc__label">Contrôle à distance</span></a></li>
+      <li><a href="#mail"><span class="toc__num">11</span><span class="toc__label">Collecteur de mails</span></a></li>
+      <li><a href="#exploitation"><span class="toc__num">12</span><span class="toc__label">Exploitation et maintenance</span></a></li>
+      <li><a href="#securite"><span class="toc__num">13</span><span class="toc__label">Couverture des risques de sécurité</span></a></li>
+      <li><a href="#incidents"><span class="toc__num">14</span><span class="toc__label">Incidents rencontrés et corrections</span></a></li>
+      <li><a href="#depot"><span class="toc__num">15</span><span class="toc__label">Dépôt Git et reproductibilité</span></a></li>
+      <li><a href="#limites"><span class="toc__num">16</span><span class="toc__label">Limites et évolutions</span></a></li>
+      <li><a href="#annexes"><span class="toc__num">A</span><span class="toc__label">Annexes : adresses, ports, commandes</span></a></li>
+    </ul>
+  </nav>
+
+  <!-- ================================================================ -->
+  <section id="objet">
+    <h2><span class="sec-num">01</span> Objet et périmètre</h2>
+    <p class="lede">Ce document décrit techniquement l'infrastructure livrée en réponse au cahier de recettes : ce qui est installé, comment c'est configuré, comment le reproduire et comment l'exploiter. Il complète le rapport de recette, qui apporte les preuves de conformité, et le dépôt Git, qui contient les scripts et fichiers de configuration.</p>
+    <p>Le périmètre couvre les deux machines virtuelles du laboratoire et tout ce qui s'y exécute. Il ne couvre pas l'hyperviseur Windows de l'hôte au-delà de la configuration VirtualBox nécessaire, ni les postes des utilisateurs finaux.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Document</th><th>Rôle</th><th>Emplacement</th></tr></thead>
+        <tbody>
+          <tr><td class="col-feat">Documentation technique</td><td>Ce document : architecture, configuration, procédures</td><td class="col-impl"><code>docs/documentation-technique.pdf</code></td></tr>
+          <tr><td class="col-feat">Rapport de recette</td><td>Vérification point par point du cahier de recettes, captures d'écran</td><td class="col-impl">Livrable séparé</td></tr>
+          <tr><td class="col-feat">Guide de montage</td><td>Procédure pas à pas ayant servi au montage</td><td class="col-impl"><code>docs/guide-de-montage.pdf</code></td></tr>
+          <tr><td class="col-feat">Dépôt Git</td><td>Scripts d'installation, configurations expurgées, outils</td><td class="col-impl"><code>glpi-securise-infra/</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Conventions</h3>
+    <p>Les commandes précédées de <code>srv-glpi$</code> s'exécutent sur le serveur, celles précédées de <code>pc-client$</code> sur le poste client. Les valeurs secrètes (clés, mots de passe) sont remplacées par <code>&lt;secret&gt;</code> ; leur emplacement réel est donné en section 12.</p>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="architecture">
+    <h2><span class="sec-num">02</span> Architecture générale</h2>
+    <p class="lede">Deux machines sur un réseau privé. Le serveur n'expose qu'un seul port au réseau, celui du VPN ; tous les services applicatifs ne sont joignables qu'à l'intérieur du tunnel, où le trafic déchiffré est inspecté par l'IPS avant d'atteindre le pare-feu.</p>
+
+    <figure class="diagram">
+      <svg viewBox="0 0 760 400" xmlns="http://www.w3.org/2000/svg" font-family="IBM Plex Sans, sans-serif" font-size="12">
+        <defs>
+          <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#1E8A85"/></marker>
+        </defs>
+        <!-- hôte -->
+        <rect x="10" y="10" width="740" height="380" rx="8" fill="none" stroke="#DDE1E7" stroke-dasharray="6 4"/>
+        <text x="24" y="32" fill="#48566E" font-family="IBM Plex Mono, monospace" font-size="11">HÔTE WINDOWS 11 · VirtualBox 7.2 · réseau NAT glpi-net 192.168.1.0/24 · DHCP + DNS 1.1.1.1 / 9.9.9.9</text>
+        <!-- client -->
+        <rect x="40" y="70" width="240" height="290" rx="6" fill="#FFFFFF" stroke="#0F2A4A" stroke-width="1.5"/>
+        <text x="60" y="96" font-weight="600" fill="#12213A" font-size="14">pc-client</text>
+        <text x="60" y="114" fill="#48566E">Xubuntu 24.04 · 1 vCPU · 2 Go</text>
+        <text x="60" y="132" font-family="IBM Plex Mono, monospace" fill="#0F2A4A">LAN 192.168.1.20 · VPN 10.8.0.2</text>
+        <g fill="#12213A">
+          <rect x="60" y="150" width="200" height="26" rx="3" fill="#E4F2F1"/><text x="70" y="167">WireGuard wg0 (pair)</text>
+          <rect x="60" y="184" width="200" height="26" rx="3" fill="#F6F5F1"/><text x="70" y="201">Agent GLPI 1.19 → inventaire</text>
+          <rect x="60" y="218" width="200" height="26" rx="3" fill="#F6F5F1"/><text x="70" y="235">x11vnc · écoute 10.8.0.2:5900</text>
+          <rect x="60" y="252" width="200" height="26" rx="3" fill="#F6F5F1"/><text x="70" y="269">UFW : 22 · 5900 sur wg0 seulement</text>
+          <rect x="60" y="286" width="200" height="26" rx="3" fill="#F6F5F1"/><text x="70" y="303">Firefox → https://glpi.local</text>
+        </g>
+        <!-- serveur -->
+        <rect x="420" y="70" width="300" height="290" rx="6" fill="#FFFFFF" stroke="#0F2A4A" stroke-width="1.5"/>
+        <text x="440" y="96" font-weight="600" fill="#12213A" font-size="14">srv-glpi</text>
+        <text x="440" y="114" fill="#48566E">Ubuntu Server 24.04 · 1 vCPU · 4 Go</text>
+        <text x="440" y="132" font-family="IBM Plex Mono, monospace" fill="#0F2A4A">LAN 192.168.1.10 · VPN 10.8.0.1</text>
+        <g fill="#12213A">
+          <rect x="440" y="150" width="260" height="26" rx="3" fill="#E4F2F1"/><text x="450" y="167">WireGuard wg0 · UDP 51820 (seul port LAN)</text>
+          <rect x="440" y="184" width="260" height="26" rx="3" fill="#FBF0DC"/><text x="450" y="201">Suricata 8 IPS (NFQUEUE) → UFW + fail2ban</text>
+          <rect x="440" y="218" width="260" height="26" rx="3" fill="#F6F5F1"/><text x="450" y="235">Apache/PHP 8.3 · GLPI 11.0.8 · HTTPS 443</text>
+          <rect x="440" y="252" width="260" height="26" rx="3" fill="#F6F5F1"/><text x="450" y="269">MariaDB (localhost) · base glpi</text>
+          <rect x="440" y="286" width="260" height="26" rx="3" fill="#F6F5F1"/><text x="450" y="303">Postfix + Dovecot IMAP (127.0.0.1) · collecteur</text>
+          <rect x="440" y="320" width="260" height="26" rx="3" fill="#F6F5F1"/><text x="450" y="337">SSH 22 · sur wg0 seulement</text>
+        </g>
+        <!-- tunnel -->
+        <path d="M280 163 L420 163" stroke="#1E8A85" stroke-width="3" marker-end="url(#arr)" marker-start="url(#arr)"/>
+        <text x="350" y="154" text-anchor="middle" fill="#1E8A85" font-weight="600">tunnel WireGuard 10.8.0.0/24</text>
+        <text x="350" y="182" text-anchor="middle" fill="#48566E" font-size="11">HTTPS · SSH · VNC · inventaire</text>
+        <!-- LAN bloqué -->
+        <path d="M280 300 L420 300" stroke="#9C6B12" stroke-width="1.5" stroke-dasharray="5 4"/>
+        <text x="350" y="292" text-anchor="middle" fill="#9C6B12" font-size="11">LAN direct : 22/80/443 filtrés</text>
+        <text x="350" y="318" text-anchor="middle" fill="#9C6B12" font-size="11">ping bloqué par l'IPS</text>
+      </svg>
+      <figcaption>Figure 1 — Vue d'ensemble : le tunnel est l'unique chemin vers les services du serveur.</figcaption>
+    </figure>
+
+    <h3>Matrice des flux</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Source</th><th>Destination</th><th>Protocole / port</th><th>Chemin</th><th>Décision</th></tr></thead>
+        <tbody>
+          <tr><td>pc-client</td><td>srv-glpi 192.168.1.10</td><td>UDP 51820</td><td>LAN</td><td><span class="badge badge--ok">Autorisé</span> (établissement du tunnel)</td></tr>
+          <tr><td>pc-client 10.8.0.2</td><td>srv-glpi 10.8.0.1</td><td>TCP 443 (GLPI), 80 (redirection)</td><td>Tunnel</td><td><span class="badge badge--ok">Autorisé</span>, inspecté par l'IPS</td></tr>
+          <tr><td>pc-client 10.8.0.2</td><td>srv-glpi 10.8.0.1</td><td>TCP 22 (SSH)</td><td>Tunnel</td><td><span class="badge badge--ok">Autorisé</span>, journalisé par l'IPS, fail2ban</td></tr>
+          <tr><td>poste d'administration (pair VPN)</td><td>pc-client 10.8.0.2</td><td>TCP 5900 (VNC)</td><td>Tunnel</td><td><span class="badge badge--ok">Autorisé</span></td></tr>
+          <tr><td>toute machine du LAN</td><td>srv-glpi 192.168.1.10</td><td>TCP 22, 80, 443</td><td>LAN</td><td><span class="badge badge--warn">Filtré</span> (UFW deny incoming)</td></tr>
+          <tr><td>toute machine</td><td>srv-glpi</td><td>ICMP echo</td><td>LAN ou tunnel</td><td><span class="badge badge--warn">Bloqué</span> (règle IPS 9000003)</td></tr>
+          <tr><td>toute machine</td><td>srv-glpi port 80</td><td>HTTP contenant <code>/etc/passwd</code></td><td>Tunnel</td><td><span class="badge badge--warn">Bloqué</span> (règle IPS 9000002)</td></tr>
+          <tr><td>srv-glpi, pc-client</td><td>Internet</td><td>HTTP/HTTPS, DNS</td><td>NAT VirtualBox</td><td><span class="badge badge--ok">Autorisé</span> (mises à jour, règles ET)</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Composants et versions</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Composant</th><th>Version</th><th>Machine</th><th>Rôle</th></tr></thead>
+        <tbody>
+          <tr><td class="col-feat">VirtualBox</td><td>7.2.16</td><td>hôte</td><td class="col-impl">Hyperviseur, réseau NAT, DHCP, redirections de ports</td></tr>
+          <tr><td class="col-feat">Ubuntu Server</td><td>24.04.4 LTS, noyau 6.8</td><td>srv-glpi</td><td class="col-impl">Système du serveur</td></tr>
+          <tr><td class="col-feat">Xubuntu</td><td>24.04.4 LTS, noyau 7.0</td><td>pc-client</td><td class="col-impl">Système du poste client (bureau XFCE)</td></tr>
+          <tr><td class="col-feat">GLPI</td><td>11.0.8</td><td>srv-glpi</td><td class="col-impl">Gestion de parc et de tickets</td></tr>
+          <tr><td class="col-feat">Apache / PHP / MariaDB</td><td>2.4 / 8.3 / 10.11</td><td>srv-glpi</td><td class="col-impl">Pile web et base de données de GLPI</td></tr>
+          <tr><td class="col-feat">WireGuard</td><td>module noyau + wireguard-tools</td><td>les deux</td><td class="col-impl">Tunnel VPN chiffré</td></tr>
+          <tr><td class="col-feat">UFW, fail2ban</td><td>0.36 / 1.0</td><td>srv-glpi (UFW aussi sur le client)</td><td class="col-impl">Pare-feu, bannissement des attaques SSH</td></tr>
+          <tr><td class="col-feat">Suricata</td><td>8.0.6 (dépôt OISF)</td><td>srv-glpi</td><td class="col-impl">IPS en ligne</td></tr>
+          <tr><td class="col-feat">Agent GLPI</td><td>1.19</td><td>pc-client</td><td class="col-impl">Inventaire du poste</td></tr>
+          <tr><td class="col-feat">x11vnc</td><td>0.9.16</td><td>pc-client</td><td class="col-impl">Prise en main à distance</td></tr>
+          <tr><td class="col-feat">Postfix, Dovecot</td><td>3.8 / 2.3</td><td>srv-glpi</td><td class="col-impl">Messagerie locale relevée par GLPI</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="virtualisation">
+    <h2><span class="sec-num">03</span> Virtualisation et réseau</h2>
+    <p class="lede">Le laboratoire tourne sur VirtualBox, sur un hôte Windows 11 où Hyper-V est actif. Cette contrainte a dicté plusieurs choix de configuration.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Paramètre</th><th>srv-glpi</th><th>pc-client</th></tr></thead>
+        <tbody>
+          <tr><td class="col-feat">Processeurs</td><td>1 vCPU, PAE/NX activé</td><td>1 vCPU, PAE/NX activé</td></tr>
+          <tr><td class="col-feat">Mémoire</td><td>4096 Mo</td><td>2048 Mo</td></tr>
+          <tr><td class="col-feat">Disque</td><td>25 Go (VDI dynamique)</td><td>20 Go (VDI dynamique)</td></tr>
+          <tr><td class="col-feat">Carte réseau</td><td>virtio-net, réseau NAT glpi-net</td><td>virtio-net, réseau NAT glpi-net</td></tr>
+          <tr><td class="col-feat">Adresse MAC</td><td>08:00:27:FB:88:DB</td><td>08:00:27:2D:58:58</td></tr>
+          <tr><td class="col-feat">Adresse réservée</td><td>192.168.1.10</td><td>192.168.1.20</td></tr>
+          <tr><td class="col-feat">Paravirtualisation</td><td>Par défaut</td><td>Par défaut</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Réseau NAT glpi-net</h3>
+    <p>Un réseau NAT VirtualBox (et non le NAT par défaut, propre à chaque VM) permet aux deux machines de se voir tout en sortant sur Internet. Le serveur DHCP intégré distribue des baux avec réservation par adresse MAC. Le relais DNS de VirtualBox ne répondant pas aux requêtes (incident n°2, section 14), l'option DHCP 6 impose directement les résolveurs publics 1.1.1.1 et 9.9.9.9.</p>
+<pre><code>VBoxManage natnetwork add --netname glpi-net --network "192.168.1.0/24" --enable --dhcp on
+VBoxManage dhcpserver modify --network=glpi-net --set-opt=6 "1.1.1.1 9.9.9.9"
+VBoxManage dhcpserver modify --network=glpi-net --mac-address=080027FB88DB --fixed-address=192.168.1.10
+VBoxManage dhcpserver modify --network=glpi-net --mac-address=0800272D5858 --fixed-address=192.168.1.20
+VBoxManage natnetwork modify --netname glpi-net --port-forward-4 "ssh-cli:tcp:[]:2223:[192.168.1.20]:22"</code></pre>
+    <p>La seule redirection de port conservée vise le client (SSH d'administration depuis l'hôte). Le serveur n'a aucune redirection : depuis l'hôte, il n'est administrable qu'en rebond par le client puis le tunnel.</p>
+    <div class="callout callout--warn">
+      <p class="callout__label">Contrainte Hyper-V</p>
+      <p>Hyper-V actif sur l'hôte force VirtualBox en mode d'exécution dégradé. Conséquences constatées : plantage du noyau invité avec deux vCPU (corrigé en passant à un seul), et snapshots à chaud inutilisables (sauvegarde mémoire à 0,5 Mo/s puis blocage). Règle d'exploitation : <strong>snapshots uniquement VM éteinte</strong>.</p>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="serveur">
+    <h2><span class="sec-num">04</span> Serveur GLPI</h2>
+    <p class="lede">GLPI 11 sur une pile Apache, PHP 8.3 et MariaDB, exposé uniquement en HTTPS, installé par un script rejouable.</p>
+    <h3>Installation</h3>
+    <p>Le script <code>scripts/serveur/etape02-glpi.sh</code> enchaîne : installation des paquets, sécurisation de MariaDB (équivalent non interactif de <code>mysql_secure_installation</code>), création de la base <code>glpi</code> et de l'utilisateur dédié, import des fuseaux horaires, téléchargement de la dernière version stable de GLPI depuis GitHub, génération du certificat, hôte virtuel, durcissement PHP, puis installation de la base par la console GLPI :</p>
+<pre><code>srv-glpi$ sudo -u www-data php bin/console db:install --db-host=localhost --db-name=glpi \
+    --db-user=glpi --db-password="&lt;secret&gt;" --default-language=fr_FR --no-interaction --force
+srv-glpi$ sudo rm -f /var/www/glpi/install/install.php
+srv-glpi$ sudo chmod 640 /var/www/glpi/config/config_db.php</code></pre>
+    <p>Les scripts longs sont lancés comme service transitoire (<code>systemd-run --unit=etape02 …</code>) afin de survivre à la fermeture de la session SSH, avec journal dans <code>/var/log/etape02-glpi.log</code>.</p>
+
+    <h3>Hôte virtuel Apache</h3>
+    <p>La racine web est le dossier <code>public/</code> de GLPI : les fichiers de configuration, la base de fichiers et le code hors de ce dossier ne sont jamais servis. Le port 80 ne fait que rediriger vers HTTPS. Trois en-têtes de sécurité sont ajoutés.</p>
+<pre><code>&lt;VirtualHost *:443&gt;
+    ServerName glpi.local
+    ServerAlias 192.168.1.10 10.8.0.1
+    DocumentRoot /var/www/glpi/public
+    SSLEngine on
+    SSLCertificateFile    /etc/ssl/certs/glpi.crt
+    SSLCertificateKeyFile /etc/ssl/private/glpi.key
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set X-Frame-Options "SAMEORIGIN"
+    Header always set Referrer-Policy "strict-origin-when-cross-origin"
+    &lt;Directory /var/www/glpi/public&gt;
+        Require all granted
+        RewriteEngine On
+        RewriteCond %{HTTP:Authorization} ^(.+)$
+        RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ index.php [QSA,L]
+    &lt;/Directory&gt;
+&lt;/VirtualHost&gt;</code></pre>
+    <p>Le certificat est auto-signé (RSA 2048, un an), avec les noms alternatifs <code>glpi.local</code>, <code>192.168.1.10</code> et <code>10.8.0.1</code>, ce qui permet à l'agent GLPI de vérifier le certificat plutôt que de désactiver la vérification.</p>
+
+    <h3>Durcissement PHP et comptes</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Élément</th><th>Valeur</th><th>Effet</th></tr></thead>
+        <tbody>
+          <tr><td class="col-feat"><code>session.cookie_httponly</code></td><td>On</td><td class="col-impl">Cookie de session inaccessible à JavaScript (XSS)</td></tr>
+          <tr><td class="col-feat"><code>session.cookie_secure</code></td><td>On</td><td class="col-impl">Cookie transmis uniquement en HTTPS</td></tr>
+          <tr><td class="col-feat"><code>session.cookie_samesite</code></td><td>Lax</td><td class="col-impl">Protection CSRF complémentaire à celle de GLPI</td></tr>
+          <tr><td class="col-feat"><code>upload_max_filesize</code>, <code>post_max_size</code></td><td>20M</td><td class="col-impl">Pièces jointes des tickets</td></tr>
+          <tr><td class="col-feat">Comptes <code>glpi</code>, <code>tech</code>, <code>normal</code>, <code>post-only</code></td><td>mots de passe aléatoires (bcrypt)</td><td class="col-impl">Suppression des mots de passe par défaut connus publiquement</td></tr>
+          <tr><td class="col-feat">Utilisateur MariaDB <code>glpi</code></td><td>droits limités à la base <code>glpi</code> + lecture de <code>mysql.time_zone_name</code></td><td class="col-impl">Moindre privilège</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Arborescence utile : application dans <code>/var/www/glpi</code>, journaux applicatifs dans <code>/var/www/glpi/files/_log/</code> (<code>php-errors.log</code>, <code>cron.log</code>, <code>mailgate.log</code>), journaux Apache dans <code>/var/log/apache2/glpi_*.log</code>.</p>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="vpn">
+    <h2><span class="sec-num">05</span> Tunnel VPN WireGuard</h2>
+    <p class="lede">WireGuard relie les deux machines par un tunnel chiffré 10.8.0.0/24. Il constitue l'unique chemin vers GLPI, SSH et VNC.</p>
+    <h3>Choix et principes</h3>
+    <ul class="plain">
+      <li><strong>WireGuard</strong> plutôt qu'OpenVPN : intégré au noyau Linux, suite cryptographique fixe (Curve25519, ChaCha20-Poly1305, BLAKE2s), configuration minimale donc peu d'erreurs possibles.</li>
+      <li><strong>Clé pré-partagée</strong> en plus des paires de clés : couche symétrique supplémentaire sur l'échange de clés, réponse à l'exigence « sécuriser le tunnel ».</li>
+      <li><strong>AllowedIPs restrictif</strong> côté serveur (<code>10.8.0.2/32</code>) : le serveur n'accepte pour ce pair que sa seule adresse VPN, aucune autre plage ne peut transiter par lui.</li>
+      <li><strong>Clés générées sur chaque machine</strong>, jamais transmises ; fichiers en <code>/etc/wireguard/</code> avec droits <code>600</code>, propriétaire root.</li>
+    </ul>
+    <h3>Configuration du serveur</h3>
+<pre><code># /etc/wireguard/wg0.conf — srv-glpi
+[Interface]
+Address    = 10.8.0.1/24
+ListenPort = 51820
+PrivateKey = &lt;secret&gt;
+
+[Peer]                      # pc-client
+PublicKey    = ePI1eUfg5a4h2Piw45kchrA5d4uaJiJDy5CS5LEWlS0=
+PresharedKey = &lt;secret&gt;
+AllowedIPs   = 10.8.0.2/32</code></pre>
+    <h3>Configuration du client</h3>
+<pre><code># /etc/wireguard/wg0.conf — pc-client
+[Interface]
+Address    = 10.8.0.2/24
+PrivateKey = &lt;secret&gt;
+
+[Peer]                      # srv-glpi
+PublicKey           = TksdrVa2N5pj/8Q1ECLlENOPW24bXuiUAZC6Kin91Rs=
+PresharedKey        = &lt;secret&gt;
+Endpoint            = 192.168.1.10:51820
+AllowedIPs          = 10.8.0.0/24
+PersistentKeepalive = 25</code></pre>
+    <p>Le service <code>wg-quick@wg0</code> est activé au démarrage sur les deux machines. Le client résout <code>glpi.local</code> vers <code>10.8.0.1</code> par <code>/etc/hosts</code>, de sorte que le navigateur, l'agent et les scripts utilisent toujours l'adresse du tunnel. Aucun masquage NAT n'est configuré : le client ne parle qu'au serveur, pas à travers lui.</p>
+    <h3>Vérification</h3>
+<pre><code>srv-glpi$ sudo wg show          # handshake récent, compteurs de transfert
+pc-client$ ping -c 3 10.8.0.1    # bloqué par l'IPS depuis l'étape 08 : utiliser curl
+pc-client$ curl -sk -o /dev/null -w "%{http_code}\n" https://glpi.local/   # 200</code></pre>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="parefeu">
+    <h2><span class="sec-num">06</span> Pare-feu et protection SSH</h2>
+    <p class="lede">UFW applique une politique « tout refusé en entrée » sur le serveur, avec une seule ouverture côté LAN, le port WireGuard. Les services ne sont autorisés que sur l'interface du tunnel.</p>
+<pre><code>srv-glpi$ sudo ufw default deny incoming
+srv-glpi$ sudo ufw default allow outgoing
+srv-glpi$ sudo ufw allow 51820/udp comment WireGuard
+srv-glpi$ sudo ufw allow in on wg0 to any port 443 proto tcp comment GLPI-via-VPN
+srv-glpi$ sudo ufw allow in on wg0 to any port 80  proto tcp comment redirection-HTTPS
+srv-glpi$ sudo ufw allow in on wg0 to any port 22  proto tcp comment SSH-via-VPN
+srv-glpi$ sudo ufw enable</code></pre>
+    <p>Règles résultantes dans <code>/etc/ufw/user.rules</code> :</p>
+<pre><code>-A ufw-user-input -p udp --dport 51820 -j ACCEPT
+-A ufw-user-input -i wg0 -p tcp --dport 443 -j ACCEPT
+-A ufw-user-input -i wg0 -p tcp --dport 80 -j ACCEPT
+-A ufw-user-input -i wg0 -p tcp --dport 22 -j ACCEPT</code></pre>
+    <p>L'activation s'est faite via un service détaché : la session SSH par le LAN qui l'a lancée est coupée par la règle elle-même, ce qui est le comportement attendu. Depuis, l'administration passe par le client puis le tunnel :</p>
+<pre><code>hôte$ ssh -i ~/.ssh/glpi-lab -o ProxyCommand="ssh -i ~/.ssh/glpi-lab -p 2223 -W %h:%p user@127.0.0.1" user@10.8.0.1</code></pre>
+    <h3>fail2ban</h3>
+    <p>La prison <code>sshd</code> par défaut est active (bannissement après plusieurs échecs d'authentification). Elle protège l'accès SSH même à l'intérieur du tunnel, où seuls des pairs authentifiés circulent, mais dont un poste pourrait être compromis.</p>
+    <h3>Pare-feu du client</h3>
+    <p>Le client applique lui aussi UFW : port 22 ouvert (administration depuis l'hôte), port 5900 (VNC) autorisé uniquement sur <code>wg0</code>.</p>
+    <div class="callout callout--warn">
+      <p class="callout__label">Interaction avec l'IPS</p>
+      <p>Les règles UFW sont évaluées <em>après</em> le passage par Suricata (chaîne <code>ufw-before-input</code>). Le mode « repeat » de NFQUEUE est indispensable pour que les paquets acceptés par l'IPS reviennent dans les règles UFW : sans lui, le pare-feu est court-circuité. Voir sections 08 et 14.</p>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="mfa">
+    <h2><span class="sec-num">07</span> Double authentification</h2>
+    <p class="lede">GLPI 11 intègre une authentification à deux facteurs par code temporaire (TOTP, RFC 6238). Elle est activée et rendue obligatoire pour tous les comptes.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Clé de configuration (contexte core)</th><th>Valeur</th><th>Signification</th></tr></thead>
+        <tbody>
+          <tr><td class="col-feat"><code>2fa_enforced</code></td><td>1</td><td class="col-impl">Tout utilisateur doit enrôler un second facteur</td></tr>
+          <tr><td class="col-feat"><code>2fa_grace_days</code></td><td>2</td><td class="col-impl">Délai laissé pour l'enrôlement après la première connexion</td></tr>
+          <tr><td class="col-feat"><code>2fa_grace_date_start</code></td><td>2026-09-03 10:22:17</td><td class="col-impl">Début du délai de grâce</td></tr>
+        </tbody>
+      </table>
+    </div>
+<pre><code>srv-glpi$ cd /var/www/glpi
+srv-glpi$ sudo -u www-data php bin/console config:set 2fa_enforced 1
+srv-glpi$ sudo -u www-data php bin/console config:set 2fa_grace_days 2</code></pre>
+    <p>Fonctionnement : à la connexion, après le mot de passe, GLPI demande le code à six chiffres généré par l'application d'authentification de l'utilisateur (Aegis, FreeOTP, Google Authenticator ou KeePassXC). Le secret est partagé une seule fois via un QR code lors de l'enrôlement ; des codes de secours à usage unique sont fournis. Un administrateur peut désenrôler un compte avec <code>php bin/console security:disable_2fa</code>.</p>
+    <p>La double authentification n'a pas été étendue à SSH (module PAM google-authenticator) : l'accès SSH est déjà conditionné à l'appartenance au VPN et à une clé. C'est un choix documenté, voir section 16.</p>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="ips">
+    <h2><span class="sec-num">08</span> IPS Suricata</h2>
+    <p class="lede">Suricata 8 fonctionne en mode prévention : chaque paquet entrant ou sortant du serveur est soumis à son verdict avant les règles du pare-feu. Il voit le trafic du tunnel déchiffré, donc les vraies requêtes GLPI.</p>
+    <h3>Installation et configuration</h3>
+    <p>Paquet du dépôt officiel OISF (<code>ppa:oisf/suricata-stable</code>), règles Emerging Threats Open maintenues par <code>suricata-update</code>. Modifications de <code>/etc/suricata/suricata.yaml</code> par rapport au fichier livré :</p>
+<pre><code>vars:
+  address-groups:
+    HOME_NET: "[192.168.1.0/24,10.8.0.0/24]"      # LAN + tunnel
+
+rule-files:
+  - suricata.rules                                # règles ET Open (≈ 52 700)
+  - /etc/suricata/rules/local.rules               # règles du laboratoire
+
+nfq:                                              # mode IPS
+  mode: repeat
+  repeat-mark: 1
+  repeat-mask: 1</code></pre>
+    <h3>Mode NFQUEUE</h3>
+    <p>Le service livré démarre Suricata en capture passive (af-packet). Une surcharge systemd le lance sur la file netfilter 0 :</p>
+<pre><code># /etc/systemd/system/suricata.service.d/override.conf
+[Service]
+ExecStart=
+ExecStart=/usr/bin/suricata -c /etc/suricata/suricata.yaml --pidfile /run/suricata.pid -q 0 -D -vvv</code></pre>
+    <p>Le renvoi du trafic vers cette file est inscrit dans <code>/etc/ufw/before.rules</code>, juste après l'acceptation de l'interface locale et avant l'acceptation des connexions établies, de façon persistante :</p>
+<pre><code>-A ufw-before-input  -m mark ! --mark 0x1/0x1 -j NFQUEUE --queue-num 0 --queue-bypass
+-A ufw-before-output -m mark ! --mark 0x1/0x1 -j NFQUEUE --queue-num 0 --queue-bypass</code></pre>
+    <p>Cycle d'un paquet : il arrive non marqué, est envoyé à Suricata ; si Suricata le rejette (<code>drop</code>), il disparaît ; s'il l'accepte, le mode <em>repeat</em> le marque (bit 1) et le réinjecte au même point de la chaîne, où la condition <code>! --mark</code> le laisse continuer vers les règles UFW. <code>--queue-bypass</code> laisse passer le trafic si Suricata n'est pas démarré : choix de disponibilité, le retirer donne un comportement « fermé en cas de panne ».</p>
+    <h3>Règles locales</h3>
+<pre><code># /etc/suricata/rules/local.rules
+alert tcp any any -> $HOME_NET 22 (msg:"LAB - Connexion SSH vers le serveur"; flow:to_server; flags:S;
+      sid:9000001; rev:1; classtype:not-suspicious;)
+drop http any any -> $HOME_NET any (msg:"LAB - Tentative de lecture de /etc/passwd bloquee"; flow:to_server;
+      http.uri; content:"/etc/passwd"; nocase; sid:9000002; rev:1; classtype:web-application-attack;)
+drop icmp any any -> $HOME_NET any (msg:"LAB - Ping vers le serveur bloque par l'IPS"; itype:8;
+      sid:9000003; rev:1; classtype:not-suspicious;)</code></pre>
+    <p>Ces règles servent de preuve de blocage indépendante d'Internet, le site de test habituel <code>testmynids.org</code> étant injoignable. Les journaux sont dans <code>/var/log/suricata/</code> : <code>fast.log</code> (une ligne par alerte), <code>eve.json</code> (événements détaillés, dont <code>alert.action</code> à <code>blocked</code> ou <code>allowed</code>), <code>stats.log</code> (compteurs <code>ips.accepted</code>, <code>ips.blocked</code>).</p>
+    <div class="callout callout--info">
+      <p class="callout__label">Délai de chargement</p>
+      <p>Avec un seul vCPU, Suricata met environ une minute à charger ses 52 700 règles après chaque démarrage. Pendant ce délai, le bypass laisse passer tout le trafic : attendre la ligne « Engine started » du journal avant tout test.</p>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="client">
+    <h2><span class="sec-num">09</span> Poste client et agent GLPI</h2>
+    <p class="lede">Le poste client est un Xubuntu 24.04 (bureau XFCE, adapté aux 2 Go de mémoire imposés). L'agent GLPI y remonte l'inventaire au serveur, à travers le tunnel.</p>
+    <p>Côté serveur, l'inventaire natif de GLPI (disponible depuis la version 10, qui remplace FusionInventory) est activé : clé <code>enabled_inventory</code> du contexte <code>inventory</code>, point d'entrée <code>https://glpi.local/front/inventory.php</code>.</p>
+    <p>Côté client, l'agent est installé par l'installeur Perl officiel et configuré dans <code>/etc/glpi-agent/conf.d/00-install.cfg</code> :</p>
+<pre><code>server       = https://glpi.local/front/inventory.php
+ca-cert-file = /etc/glpi-agent/glpi.crt
+tag          = salle-formation</code></pre>
+    <p>Le certificat du serveur a été récupéré à travers le tunnel (<code>openssl s_client</code>) et fourni à l'agent, qui vérifie donc l'identité du serveur à chaque envoi. Le service <code>glpi-agent</code> tourne en permanence et envoie un inventaire complet toutes les 24 heures (fréquence réglable dans GLPI) ; <code>sudo glpi-agent --force</code> déclenche un envoi immédiat. Le poste apparaît dans Parc → Ordinateurs avec matériel, logiciels (environ 1 800 paquets), disques, interfaces réseau (dont les adresses LAN et VPN) et le tag.</p>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="vnc">
+    <h2><span class="sec-num">10</span> Contrôle à distance</h2>
+    <p class="lede">x11vnc partage l'écran réel du poste client. Il n'écoute que sur l'adresse VPN, et GLPI expose le lien de prise en main depuis la fiche de l'ordinateur.</p>
+<pre><code># /etc/systemd/system/x11vnc.service — pc-client
+[Unit]
+Description=Serveur VNC (x11vnc) sur le tunnel VPN uniquement
+After=display-manager.service wg-quick@wg0.service
+Wants=wg-quick@wg0.service
+[Service]
+ExecStart=/usr/bin/x11vnc -auth guess -display :0 -rfbauth /etc/x11vnc.pass -no6 \
+          -listen 10.8.0.2 -rfbport 5900 -forever -shared -noxdamage
+Restart=on-failure
+[Install]
+WantedBy=multi-user.target</code></pre>
+    <p>Le mot de passe VNC est stocké haché dans <code>/etc/x11vnc.pass</code> (root, 600). Deux barrières limitent l'exposition : l'écoute restreinte à <code>10.8.0.2</code>, et la règle UFW <code>5900/tcp on wg0</code>. Un scan depuis le LAN ne voit pas le port.</p>
+    <p>Intégration GLPI : Configuration → Liens externes → « Prise en main VNC », lien <code>vnc://[IP]:5900</code>, associé au type Ordinateur. GLPI substitue <code>[IP]</code> par chaque adresse inventoriée du poste ; l'onglet Liens de la fiche propose donc <code>vnc://10.8.0.2:5900</code>, à ouvrir avec un client VNC (Remmina, TigerVNC Viewer) depuis un poste membre du VPN.</p>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="mail">
+    <h2><span class="sec-num">11</span> Collecteur de mails</h2>
+    <p class="lede">GLPI relève une boîte IMAP et transforme chaque message en ticket. La boîte est fournie par une messagerie locale au serveur, sans dépendance externe ni donnée réelle.</p>
+    <h3>Messagerie locale</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Composant</th><th>Paramètres retenus</th></tr></thead>
+        <tbody>
+          <tr><td class="col-feat">Postfix</td><td class="col-impl"><code>inet_interfaces = loopback-only</code>, <code>inet_protocols = ipv4</code>, <code>myhostname = srv-glpi.local</code>, destinations locales uniquement : aucun relais, aucun port SMTP exposé</td></tr>
+          <tr><td class="col-feat">Dovecot</td><td class="col-impl"><code>listen = 127.0.0.1</code>, <code>disable_plaintext_auth = no</code> (acceptable car réservé à la boucle locale), boîtes mbox dans <code>/var/mail/</code></td></tr>
+          <tr><td class="col-feat">Compte <code>support</code></td><td class="col-impl">Compte système sans shell, mot de passe aléatoire dans <code>/root/mail-support.env</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>Collecteur et tâche automatique</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Objet GLPI</th><th>Valeur</th></tr></thead>
+        <tbody>
+          <tr><td class="col-feat">Collecteur « Support par mail »</td><td class="col-impl">serveur <code>{localhost:143/imap/notls}INBOX</code>, identifiant <code>support</code>, actif</td></tr>
+          <tr><td class="col-feat">Action automatique <code>mailgate</code></td><td class="col-impl">mode CLI, fréquence 120 s</td></tr>
+          <tr><td class="col-feat">Cron système <code>/etc/cron.d/glpi</code></td><td class="col-impl"><code>* * * * * www-data /usr/bin/php /var/www/glpi/front/cron.php</code></td></tr>
+          <tr><td class="col-feat">Utilisateur <code>normal</code></td><td class="col-impl">adresse <code>normal@srv-glpi.local</code> : GLPI rattache le ticket au demandeur par l'adresse d'expédition</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Le mot de passe du collecteur est chiffré par GLPI avec sa clé d'instance (<code>config/glpicrypt.key</code>). Il ne peut donc pas être écrit directement en base : le script <code>scripts/glpi/fix-collector.php</code> amorce le noyau GLPI comme sa console puis passe par l'API <code>MailCollector::update()</code>, qui chiffre correctement la valeur.</p>
+    <h3>Cheminement d'un mail</h3>
+    <ol class="steps">
+      <li>Un utilisateur envoie un mail à <code>support@localhost</code> ; Postfix le dépose dans <code>/var/mail/support</code>.</li>
+      <li>Chaque minute, le cron système lance <code>front/cron.php</code>, qui exécute <code>mailgate</code> si sa fréquence est échue.</li>
+      <li>Le collecteur ouvre la boîte en IMAP, lit les messages non traités, identifie le demandeur par l'adresse d'expédition.</li>
+      <li>Un ticket est créé (titre = sujet, description = corps, source « E-Mail »), visible dans Assistance → Tickets.</li>
+    </ol>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="exploitation">
+    <h2><span class="sec-num">12</span> Exploitation et maintenance</h2>
+    <p class="lede">Ce qu'un administrateur doit savoir pour faire vivre la plateforme.</p>
+    <h3>Comptes et secrets</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Secret</th><th>Emplacement</th><th>Droits</th></tr></thead>
+        <tbody>
+          <tr><td class="col-feat">Mots de passe des comptes GLPI</td><td><code>srv-glpi:/root/glpi-comptes.txt</code></td><td>root, 600</td></tr>
+          <tr><td class="col-feat">Identifiants MariaDB</td><td><code>srv-glpi:/root/glpi-db.env</code> et <code>/var/www/glpi/config/config_db.php</code></td><td>root 600 / www-data 640</td></tr>
+          <tr><td class="col-feat">Boîte support</td><td><code>srv-glpi:/root/mail-support.env</code></td><td>root, 600</td></tr>
+          <tr><td class="col-feat">Clés WireGuard</td><td><code>/etc/wireguard/*.key</code>, <code>*.psk</code> sur chaque machine</td><td>root, 600</td></tr>
+          <tr><td class="col-feat">Mot de passe VNC</td><td><code>pc-client:/root/vnc-mdp.txt</code>, haché dans <code>/etc/x11vnc.pass</code></td><td>root, 600</td></tr>
+          <tr><td class="col-feat">Clé SSH d'administration</td><td>poste hôte, <code>~/.ssh/glpi-lab</code> ; publique dans <code>~user/.ssh/authorized_keys</code> des deux VM</td><td>utilisateur hôte</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>Le compte système <code>user</code> des deux machines dispose de <code>sudo</code> sans mot de passe (<code>/etc/sudoers.d/90-user-nopasswd</code>), un confort de laboratoire à retirer en production.</p>
+
+    <h3>Procédures courantes</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Opération</th><th>Marche à suivre</th></tr></thead>
+        <tbody>
+          <tr><td class="col-feat">Ordre de démarrage</td><td class="col-impl">srv-glpi d'abord, attendre une minute (Suricata), puis pc-client. Le tunnel se rétablit seul grâce au keepalive.</td></tr>
+          <tr><td class="col-feat">Snapshot</td><td class="col-impl">VM éteinte uniquement : <code>VBoxManage snapshot srv-glpi take "nom"</code>. Snapshots existants : 01-base-installee, 02-glpi-vpn.</td></tr>
+          <tr><td class="col-feat">Ajouter un pair VPN</td><td class="col-impl">Sur le nouveau poste : générer clé et PSK ; sur le serveur : bloc <code>[Peer]</code> avec une adresse 10.8.0.x/32 puis <code>wg syncconf wg0 &lt;(wg-quick strip wg0)</code>. Aucune règle UFW à ajouter.</td></tr>
+          <tr><td class="col-feat">Ajouter un utilisateur GLPI</td><td class="col-impl">Administration → Utilisateurs ; il devra enrôler la 2FA sous deux jours. Renseigner son adresse mail s'il doit ouvrir des tickets par mail.</td></tr>
+          <tr><td class="col-feat">Mettre à jour GLPI</td><td class="col-impl">Snapshot, sauvegarde base (<code>mysqldump glpi</code>), extraire la nouvelle archive dans <code>/var/www/glpi</code> en conservant <code>config/</code> et <code>files/</code>, puis <code>php bin/console db:update</code>.</td></tr>
+          <tr><td class="col-feat">Mettre à jour les règles IPS</td><td class="col-impl"><code>sudo suricata-update &amp;&amp; sudo systemctl restart suricata</code> ; vérifier « rules successfully loaded » dans <code>suricata.log</code>.</td></tr>
+          <tr><td class="col-feat">Forcer la relève des mails</td><td class="col-impl"><code>UPDATE glpi_crontasks SET lastrun=NULL WHERE name='mailgate'</code> puis <code>php front/cron.php mailgate</code> (sinon la tâche attend son échéance).</td></tr>
+          <tr><td class="col-feat">Restaurer les tableaux de bord</td><td class="col-impl"><code>scripts/glpi/restore-dashboards.php</code> recrée Central, Parc et Assistance depuis les définitions internes.</td></tr>
+          <tr><td class="col-feat">Sauvegarde</td><td class="col-impl">Base : <code>mysqldump glpi</code> ; fichiers : <code>/var/www/glpi/files</code> et <code>config</code> ; configurations système listées dans le dépôt.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>Journaux à surveiller</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Journal</th><th>Contenu</th></tr></thead>
+        <tbody>
+          <tr><td class="col-feat"><code>/var/log/suricata/eve.json</code>, <code>fast.log</code></td><td class="col-impl">Alertes et blocages de l'IPS (<code>jq 'select(.event_type=="alert")'</code>)</td></tr>
+          <tr><td class="col-feat"><code>/var/log/ufw.log</code></td><td class="col-impl">Paquets refusés par le pare-feu (préfixe <code>[UFW BLOCK]</code>)</td></tr>
+          <tr><td class="col-feat"><code>fail2ban-client status sshd</code></td><td class="col-impl">Adresses bannies</td></tr>
+          <tr><td class="col-feat"><code>/var/log/apache2/glpi_access.log</code></td><td class="col-impl">Requêtes HTTP, dont les envois d'inventaire de l'agent</td></tr>
+          <tr><td class="col-feat"><code>/var/www/glpi/files/_log/</code></td><td class="col-impl">Erreurs PHP, actions automatiques, collecteur</td></tr>
+          <tr><td class="col-feat"><code>journalctl -u wg-quick@wg0</code>, <code>sudo wg show</code></td><td class="col-impl">État du tunnel</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="securite">
+    <h2><span class="sec-num">13</span> Couverture des risques de sécurité</h2>
+    <p class="lede">Positionnement de l'infrastructure face aux familles de risques du cahier des charges. Les mesures applicatives internes à GLPI (contrôle d'accès par profil, protection CSRF, journal d'audit) sont celles du produit, non modifiées.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Risque</th><th>Mesures en place</th><th>Couverture</th></tr></thead>
+        <tbody>
+          <tr><td class="col-feat">Exposition des services</td><td class="col-impl">Seul UDP 51820 ouvert côté LAN ; HTTPS, SSH et VNC uniquement dans le tunnel ; scans LAN « filtered »</td><td><span class="badge badge--ok">Couvert</span></td></tr>
+          <tr><td class="col-feat">Interception en transit</td><td class="col-impl">WireGuard (chiffrement + PSK) et HTTPS à l'intérieur ; cookies Secure</td><td><span class="badge badge--ok">Couvert</span></td></tr>
+          <tr><td class="col-feat">Vol ou devinette de mot de passe</td><td class="col-impl">2FA obligatoire, mots de passe par défaut remplacés, hachage bcrypt, fail2ban sur SSH, accès SSH par clé</td><td><span class="badge badge--ok">Couvert</span></td></tr>
+          <tr><td class="col-feat">Attaques web (injection, traversée, XSS)</td><td class="col-impl">IPS en ligne sur le trafic déchiffré, en-têtes de sécurité, racine web <code>public/</code>, HttpOnly/SameSite, protections natives de GLPI</td><td><span class="badge badge--ok">Couvert</span></td></tr>
+          <tr><td class="col-feat">Défaut de journalisation</td><td class="col-impl">Suricata (eve.json), UFW, fail2ban, Apache, journaux GLPI ; aucune donnée secrète dans les journaux</td><td><span class="badge badge--ok">Couvert</span></td></tr>
+          <tr><td class="col-feat">Composants vulnérables</td><td class="col-impl">Ubuntu 24.04 LTS à jour, GLPI 11.0.8 et agent 1.19 (dernières versions), Suricata 8 du dépôt éditeur, règles ET mises à jour</td><td><span class="badge badge--ok">Couvert</span></td></tr>
+          <tr><td class="col-feat">Secrets exposés</td><td class="col-impl">Aucun secret dans le dépôt Git (<code>.gitignore</code>), fichiers 600 root, mot de passe du collecteur chiffré par GLPI</td><td><span class="badge badge--ok">Couvert</span></td></tr>
+          <tr><td class="col-feat">Certificat non reconnu</td><td class="col-impl">Auto-signé : l'agent le vérifie explicitement, les navigateurs affichent un avertissement</td><td><span class="badge badge--warn">Partiel</span> (voir section 16)</td></tr>
+          <tr><td class="col-feat">Disponibilité de l'IPS</td><td class="col-impl"><code>--queue-bypass</code> : arrêt de Suricata = trafic non inspecté mais toujours filtré par UFW</td><td><span class="badge badge--warn">Choix assumé</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="incidents">
+    <h2><span class="sec-num">14</span> Incidents rencontrés et corrections</h2>
+    <p class="lede">Chaque incident a été diagnostiqué, corrigé et intégré aux scripts ou à la configuration. Ils font partie du retour d'expérience du projet.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>#</th><th>Symptôme</th><th>Cause</th><th>Correction</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td class="col-feat">Plantage du noyau pendant l'installation d'Ubuntu (trace <code>cpu_startup_entry</code>)</td><td class="col-impl">VirtualBox en mode dégradé sous Hyper-V, instable avec plusieurs vCPU</td><td>1 vCPU par VM, PAE/NX, carte virtio</td></tr>
+          <tr><td>2</td><td class="col-feat">Installateur bloqué sur la vérification du miroir</td><td class="col-impl">Le relais DNS du réseau NAT VirtualBox (192.168.1.1) ne répondait pas</td><td>Option DHCP 6 avec 1.1.1.1 et 9.9.9.9</td></tr>
+          <tr><td>3</td><td class="col-feat">Snapshot à chaud interminable puis VM figée</td><td class="col-impl">Sauvegarde mémoire à 0,5 Mo/s sous Hyper-V, puis blocage de VirtualBox</td><td>Arrêt forcé du processus, snapshots à froid uniquement</td></tr>
+          <tr><td>4</td><td class="col-feat">Script d'installation mort silencieusement</td><td class="col-impl">Processus tué à la fermeture de la session SSH ; puis pipeline <code>tr | head</code> incompatible avec <code>set -o pipefail</code></td><td>Lancement via <code>systemd-run</code>, génération des mots de passe par <code>openssl rand</code></td></tr>
+          <tr><td>5</td><td class="col-feat">Boucle sur l'écran de connexion du client</td><td class="col-impl">Dossier personnel créé par root avant l'installation du compte</td><td><code>chown -R user:user /home/user</code></td></tr>
+          <tr><td>6</td><td class="col-feat">Collecteur : « cannot login, user or password wrong »</td><td class="col-impl">Mot de passe inséré en clair alors que GLPI attend une valeur chiffrée</td><td>Script PHP passant par l'API GLPI (section 11)</td></tr>
+          <tr><td>7</td><td class="col-feat">Ports du serveur de nouveau ouverts depuis le LAN après l'activation de Suricata</td><td class="col-impl">En mode NFQUEUE « accept », le verdict de Suricata fait sortir le paquet de la chaîne avant les règles UFW</td><td>Mode <code>repeat</code> avec marquage, règle NFQUEUE conditionnée à <code>! --mark 0x1/0x1</code> (section 08)</td></tr>
+          <tr><td>8</td><td class="col-feat">Tableaux de bord GLPI supprimés par erreur</td><td class="col-impl">Bouton corbeille du tableau de bord, sans confirmation</td><td>Recréation depuis <code>Dashboard::getDefaults()</code> (<code>scripts/glpi/restore-dashboards.php</code>)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout callout--warn">
+      <p class="callout__label">Enseignement principal</p>
+      <p>L'incident n°7 est le plus instructif : l'IPS fonctionnait, le pare-feu semblait actif, et pourtant le serveur était exposé. Seul un retest complet des preuves (scan de ports depuis le LAN) l'a révélé. Toute modification de la chaîne de filtrage doit être suivie d'un rejeu des tests de la recette.</p>
+    </div>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="depot">
+    <h2><span class="sec-num">15</span> Dépôt Git et reproductibilité</h2>
+    <p class="lede">Le dépôt <code>glpi-securise-infra</code> contient tout ce qui permet de rejouer l'installation, sans aucun secret.</p>
+<pre><code>README.md                  architecture, correspondance avec le cahier de recettes, procédure
+docs/                      guide de montage (HTML, PDF), légende des captures, cette documentation
+scripts/serveur/           etape02-glpi.sh · etape06-suricata.sh · etape06b-tests.sh · etape09-mail.sh
+scripts/glpi/              fix-collector.php · restore-dashboards.php
+scripts/demo/              demo-vpn.sh · demo-ips.sh · demo-firewall.sh · demo-mail.sh · demo-ips-log.sh
+config/serveur/            apache2, wireguard (expurgé), ufw, suricata, systemd, mail, cron, config GLPI
+config/client/             wireguard (expurgé), glpi-agent, systemd (x11vnc), ufw
+tools/                     virtualbox-setup.ps1 · azerty_inject.py</code></pre>
+    <p>Historique : une branche <code>main</code> et une branche <code>feat/NN-…</code> par étape du cahier de recettes, fusionnées sans avance rapide pour conserver la trace de chaque lot. Le <code>.gitignore</code> exclut clés, mots de passe, fichiers <code>.env</code>, images disques, ISO et vidéos ; un <code>.gitattributes</code> impose les fins de ligne Linux aux scripts.</p>
+    <p>Rejouer l'installation sur deux VM neuves suit l'ordre du guide de montage : configuration VirtualBox (<code>tools/virtualbox-setup.ps1</code>), étape 02 par script, VPN et pare-feu à partir des fichiers de <code>config/</code>, 2FA par la console GLPI, étape 06 par script, agent et VNC à partir de <code>config/client/</code>, étape 09 par script puis <code>fix-collector.php</code>.</p>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="limites">
+    <h2><span class="sec-num">16</span> Limites et évolutions</h2>
+    <ul class="gap-list">
+      <li><strong>Certificat auto-signé.</strong> Suffisant en recette ; en production, une autorité interne (ou ACME si le nom est public) supprimerait les avertissements et permettrait la rotation.</li>
+      <li><strong>Double authentification limitée à GLPI.</strong> Le module PAM google-authenticator ajouterait un second facteur à SSH ; il n'a pas été mis en place, l'accès SSH étant déjà conditionné au VPN et à une clé.</li>
+      <li><strong>IPS en bypass.</strong> Le choix de laisser passer le trafic si Suricata s'arrête privilégie la disponibilité. L'alternative « fermé en cas de panne » se règle en retirant <code>--queue-bypass</code>.</li>
+          <li><strong>Sudo sans mot de passe</strong> sur le compte d'administration des VM, pour les besoins du montage automatisé. À retirer hors laboratoire.</li>
+      <li><strong>Messagerie locale.</strong> Le collecteur fonctionne à l'identique avec une boîte IMAP externe (changer le serveur et activer TLS dans la configuration du collecteur).</li>
+      <li><strong>Un seul poste d'administration VPN.</strong> Ajouter le poste de l'administrateur comme pair (section 12) permettrait la prise en main VNC et l'accès GLPI sans passer par le client.</li>
+      <li><strong>Sauvegardes.</strong> Aucune sauvegarde automatique n'est planifiée ; un <code>mysqldump</code> quotidien vers un volume dédié serait la première évolution.</li>
+      <li><strong>Performances.</strong> Un seul vCPU par VM allonge le chargement des règles Suricata et l'installation des paquets ; sans Hyper-V sur l'hôte, deux vCPU seraient possibles.</li>
+    </ul>
+  </section>
+
+  <!-- ================================================================ -->
+  <section id="annexes">
+    <h2><span class="sec-num">A</span> Annexes</h2>
+    <h3>A.1 Adresses et ports</h3>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Machine</th><th>Interface</th><th>Adresse</th><th>Services en écoute</th></tr></thead>
+        <tbody>
+          <tr><td rowspan="2" class="col-feat">srv-glpi</td><td>enp0s3 (LAN)</td><td>192.168.1.10/24</td><td>UDP 51820 (WireGuard) — tout le reste filtré</td></tr>
+          <tr><td>wg0 (VPN)</td><td>10.8.0.1/24</td><td>TCP 22 SSH, 80 redirection, 443 GLPI</td></tr>
+          <tr><td rowspan="2" class="col-feat">pc-client</td><td>enp0s3 (LAN)</td><td>192.168.1.20/24</td><td>TCP 22 SSH (administration depuis l'hôte via 127.0.0.1:2223)</td></tr>
+          <tr><td>wg0 (VPN)</td><td>10.8.0.2/24</td><td>TCP 5900 VNC</td></tr>
+          <tr><td class="col-feat">srv-glpi (local)</td><td>lo</td><td>127.0.0.1</td><td>TCP 3306 MariaDB, 25 Postfix, 143 Dovecot</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <h3>A.2 Commandes de vérification</h3>
+<pre><code># Tunnel
+srv-glpi$ sudo wg show
+# Pare-feu et exposition
+srv-glpi$ sudo ufw status verbose
+pc-client$ nmap -Pn -p 22,80,443 192.168.1.10      # attendu : filtered
+pc-client$ nmap -Pn -p 22,80,443 10.8.0.1          # attendu : open
+# IPS
+srv-glpi$ sudo suricata -T -c /etc/suricata/suricata.yaml
+srv-glpi$ sudo iptables -S ufw-before-input | grep NFQUEUE
+pc-client$ curl --max-time 8 "http://10.8.0.1/index.php?file=/etc/passwd"   # attendu : timeout
+srv-glpi$ sudo jq -c 'select(.alert.signature_id>=9000001) | {timestamp,src_ip,action:.alert.action,sig:.alert.signature}' /var/log/suricata/eve.json | tail
+# Inventaire
+pc-client$ sudo glpi-agent --force
+# Collecteur
+srv-glpi$ ./demo-mail.sh "Sujet du ticket"</code></pre>
+    <h3>A.3 Scripts de démonstration</h3>
+    <p>Sur le client : <code>demo-vpn.sh</code> (tunnel et scans), <code>demo-ips.sh</code> (attaque bloquée). Sur le serveur : <code>demo-firewall.sh</code>, <code>demo-mail.sh</code>, <code>demo-ips-log.sh</code>. Chacun tient en une commande, sans copier-coller, pour les démonstrations en direct.</p>
+  </section>
+
+  <footer class="doc-footer">
+    <p>Documentation technique — Infrastructure GLPI sécurisée · Bidault Dorian &amp; Febbraro Enzo · LiveCampus · septembre 2026</p>
+  </footer>
+</div>
+</body></html>
